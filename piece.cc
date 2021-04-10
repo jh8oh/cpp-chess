@@ -7,3 +7,7 @@ Piece::~Piece() {}
 Colour Piece::getColour() {
     return colour;
 }
+
+bool Piece::getPromotable() {
+    return promotable;
+}

@@ -10,11 +10,11 @@ void Square::removePiece() {
     delete piece;
 }
 
-Piece Square::*getPiece() {
-    return piece;
-}
-
 void Square::setPiece(Piece *piece) {
     removePiece();
-    this.piece = piece;
+    this->piece = piece;
+}
+
+Piece *Square::getPiece() const {
+    return piece;
 }

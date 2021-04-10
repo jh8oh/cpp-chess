@@ -11,8 +11,8 @@ class Square {
     ~Square();  // Destructor
 
     void removePiece();           // Deletes the piece from this square
-    Piece *getPiece();            // Gets the piece that is on this square
     void setPiece(Piece *piece);  // Sets the square's piece
+    Piece *getPiece() const;      // Gets the piece that is on this square
 };
 
 #endif
