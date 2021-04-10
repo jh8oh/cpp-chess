@@ -18,13 +18,13 @@ class ChessGame {
     Colour turn;
 
     // Basic helper functions
-    Square getSquare(std::string sSquare);  // Returns the appropriate board index
-    Piece *getPiece(char sPiece);           // Returns the appropriate piece
-    Colour getColour(std::string sColour);  // Returns the apporopriate enum colour
+    Square *getSquare(std::string sSquare);  // Returns the appropriate square
+    Piece *getPiece(char sPiece);            // Returns the appropriate piece
+    Colour getColour(std::string sColour);   // Returns the apporopriate enum colour
 
     // Set up functions (does not disply board after)
-    void addPiece(Piece *piece, Square square);
-    void removePiece(Square square);
+    void addPiece(Piece *piece, Square *square);
+    void removePiece(Square *square);
     void setTurn(Colour colour);
 
    public:

@@ -16,20 +16,20 @@ ChessGame::ChessGame() {
 
     // Set pieces
     for (int i = 0; i < 8; i++) {
-        addPiece(new Pawn(Colour::White), 48 + i);
-        addPiece(new Pawn(Colour::Black), 8 + i);
+        addPiece(new Pawn(Colour::White), &(board[48 + i]));
+        addPiece(new Pawn(Colour::Black), &(board[8 + i]));
     }
 
     // Lambda for setting up back row
     auto setUpBackRow = [&](Colour colour, int rowStart) {
-        addPiece(new Rook(colour), rowStart + 0);
-        addPiece(new Knight(colour), rowStart + 1);
-        addPiece(new Bishop(colour), rowStart + 2);
-        addPiece(new Queen(colour), rowStart + 3);
-        addPiece(new King(colour), rowStart + 4);
-        addPiece(new Bishop(colour), rowStart + 5);
-        addPiece(new Knight(colour), rowStart + 6);
-        addPiece(new Rook(colour), rowStart + 7);
+        addPiece(new Rook(colour), &(board[rowStart + 0]));
+        addPiece(new Knight(colour), &(board[rowStart + 1]));
+        addPiece(new Bishop(colour), &(board[rowStart + 2]));
+        addPiece(new Queen(colour), &(board[rowStart + 3]));
+        addPiece(new King(colour), &(board[rowStart + 4]));
+        addPiece(new Bishop(colour), &(board[rowStart + 5]));
+        addPiece(new Knight(colour), &(board[rowStart + 6]));
+        addPiece(new Rook(colour), &(board[rowStart + 7]));
     };
 
     setUpBackRow(Colour::White, 56);
@@ -51,7 +51,7 @@ void ChessGame::displayBoard() {
         for (int r = 0; r < 8; r++) {
             std::cout << (char)('8' - r) << " ";  // Row numbers
             for (int c = 0; c < 8; c++) {
-                Square square = getSquare((r * 8) + c);
+                Square square = board[(r * 8) + c];
                 if (square.getPiece() == nullptr) {
                     std::cout << "-";
                 } else {
@@ -69,7 +69,7 @@ void ChessGame::displayBoard() {
     }
 }
 
-Square ChessGame::getSquare(std::string sSquare) {
+Square *ChessGame::getSquare(std::string sSquare) {
     int row, column;
 
     // Converts characters to ASCII equivilent then remove the difference from 0.
@@ -81,7 +81,7 @@ Square ChessGame::getSquare(std::string sSquare) {
         throw InvalidSquare{};
     }
 
-    return board[((row * 8) + column)];
+    return &(board[((row * 8) + column)]);
 }
 
 Piece *ChessGame::getPiece(char sPiece) {
@@ -131,14 +131,14 @@ Colour ChessGame::getColour(std::string sColour) {
 
 void ChessGame::emptyBoard() {
     for (int i = 0; i < 64; i++) {
-        delete board[i];
+        board[i].removePiece();
     }
 }
 
 void ChessGame::addPiece(char sPiece, std::string sSquare) {
     try {
         Piece *piece = getPiece(sPiece);
-        Square square = getSquare(sSquare);
+        Square *square = getSquare(sSquare);
         addPiece(piece, square);
         displayBoard();
     } catch (InvalidPiece) {
@@ -148,13 +148,13 @@ void ChessGame::addPiece(char sPiece, std::string sSquare) {
     }
 }
 
-void ChessGame::addPiece(Piece *piece, Square square) {
-    square.setPiece(piece);
+void ChessGame::addPiece(Piece *piece, Square *square) {
+    square->setPiece(piece);
 }
 
 void ChessGame::removePiece(std::string sSquare) {
     try {
-        Square square = getSquare(sSquare);
+        Square *square = getSquare(sSquare);
         removePiece(square);
         displayBoard();
     } catch (InvalidSquare) {
@@ -162,8 +162,8 @@ void ChessGame::removePiece(std::string sSquare) {
     }
 }
 
-void ChessGame::removePiece(Square square) {
-    square.removePiece();
+void ChessGame::removePiece(Square *square) {
+    square->removePiece();
 }
 
 void ChessGame::setTurn(std::string sColour) {
@@ -189,11 +189,11 @@ void ChessGame::resign() {
 void ChessGame::move(std::string sStartSquare, std::string sEndSquare) {
     try {
         // Get start and end squares
-        Square startSquare = getSquare(sStartSquare);
-        Square endSquare = getSquare(sEndSquare);
+        Square *startSquare = getSquare(sStartSquare);
+        Square *endSquare = getSquare(sEndSquare);
 
         // Grab piece on this square
-        Piece *piece = startSquare.getPiece();
+        Piece *piece = startSquare->getPiece();
         if ((piece->getColour() != turn) || (piece == nullptr)) {
             throw InvalidMove{};
         }
@@ -206,8 +206,8 @@ void ChessGame::move(std::string sStartSquare, std::string sEndSquare) {
 void ChessGame::promote(std::string sSquare, char sPromotion) {
     try {
         // Check colour of the pawn on the square
-        Square square = getSquare(sSquare);
-        Colour pieceColour = (square.getPiece())->getColour();
+        Square *square = getSquare(sSquare);
+        Colour pieceColour = (square->getPiece())->getColour();
         if (pieceColour == Colour::Black) {
             // To lowercase if black
             sPromotion = std::tolower(sPromotion);
@@ -216,8 +216,8 @@ void ChessGame::promote(std::string sSquare, char sPromotion) {
             sPromotion = std::toupper(sPromotion);
         }
 
-        Piece promotion = getPiece(sPromotion);
-        if (promotion.getPromotable()) {
+        Piece *promotion = getPiece(sPromotion);
+        if (promotion->getPromotable()) {
             // If pawn is able to promote to this square
             addPiece(promotion, square);
         } else {
