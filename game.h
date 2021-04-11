@@ -13,7 +13,7 @@ class Game {
     Colour turn;
 
     // Helper functions
-    int getSquare(std::string sSquare);     // Returns the appropriate square index
+    int[] getSquare(std::string sSquare);   // Returns the appropriate square index
     Piece *getPiece(char sPiece);           // Returns the appropriate piece
     Colour getColour(std::string sColour);  // Returns the apporopriate enum colour
 

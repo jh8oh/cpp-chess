@@ -5,24 +5,25 @@
 
 Game::Game(std::shared_ptr<Board> board, Colour turn) : board{board}, turn{turn} {}
 
-int Game::getSquare(std::string sSquare) {
+int[] Game::getSquare(std::string sSquare) {
     // Checks if string is 2 characters long
     if (sSquare.legth() != 2) {
         throw InvalidSquare{sSquare};
     }
 
-    int row, column;
+    // [0] - row, [1] - column
+    int square[2];
 
     // Converts characters to ASCII equivilent then remove the difference from 0.
-    column = (int)(sSquare.at(0) - 'a');
-    row = 7 - ((int)(sSquare.at(1) - '1'));  // Invert the row (since row '1' starts at the bottom)
+    square[0] = 7 - ((int)(sSquare.at(1) - '1'));  // Invert the row (since row '1' starts at the bottom)
+    square[1] = (int)(sSquare.at(0) - 'a');
 
     // Check if column and row are between 0 and 7
     if ((column < 0) || (column > 7) || (row < 0) || (row > 7)) {
         throw InvalidSquare{sSquare};
     }
 
-    return (row * 8) + column;
+    return square;
 }
 
 Piece *Game::getPiece(char sPiece) {
@@ -78,8 +79,8 @@ void Game::clearBoard() {
 void Game::addPiece(char sPiece, std::string sSquare) {
     try {
         Piece *piece = getPiece(sPiece);
-        int square = getSquare(sSquare);
-        board->addPiece(piece, square);
+        int[] square = getSquare(sSquare);
+        board->addPiece(piece, square[0], square[1]);
         board->displayBoard();
     } catch (InvalidPiece e) {
         std::cout << "Invalid piece: " << e.getInvalidPiece() << std::endl;
@@ -90,8 +91,8 @@ void Game::addPiece(char sPiece, std::string sSquare) {
 
 void Game::removePiece(std::string sSquare) {
     try {
-        int square = getSquare(sSquare);
-        board->removePiece(square);
+        int[] square = getSquare(sSquare);
+        board->removePiece(square[0], square[1]);
         board->displayBoard();
     } catch (InvalidSquar e) {
         std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;

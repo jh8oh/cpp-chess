@@ -4,8 +4,6 @@
 
 Board::Board() {
     // Set up the square's observers
-    for (int i = 0; i < 64; i++) {
-    }
 }
 
 void Board::init() {
@@ -14,38 +12,40 @@ void Board::init() {
 
     // Set pawns
     for (int i = 0; i < 8; i++) {
-        addPiece(new Piece(Colour::White, PieceType::Pawn), 48 + i);
-        addPiece(new Piece(Colour::Black, PieceType::Pawn), 8 + i);
+        addPiece(new Piece(Colour::Black, PieceType::Pawn), 1, i);
+        addPiece(new Piece(Colour::White, PieceType::Pawn), 6, i);
     }
 
     // Set backrow
-    auto setUpBackRow = [&](Colour colour, int rowStart) {
-        addPiece(new Piece(colour, PieceType::Rook), rowStart + 0);
-        addPiece(new Piece(colour, PieceType::Knight), rowStart + 1);
-        addPiece(new Piece(colour, PieceType::Bishop), rowStart + 2);
-        addPiece(new Piece(colour, PieceType::Queen), rowStart + 3);
-        addPiece(new Piece(colour, PieceType::King), rowStart + 4);
-        addPiece(new Piece(colour, PieceType::Bishop), rowStart + 5);
-        addPiece(new Piece(colour, PieceType::Knight), rowStart + 6);
-        addPiece(new Piece(colour, PieceType::Rook), rowStart + 7);
+    auto setUpBackRow = [&](Colour colour, int row) {
+        addPiece(new Piece(colour, PieceType::Rook), row, 0);
+        addPiece(new Piece(colour, PieceType::Knight), row, 1);
+        addPiece(new Piece(colour, PieceType::Bishop), row, 2);
+        addPiece(new Piece(colour, PieceType::Queen), row, 3);
+        addPiece(new Piece(colour, PieceType::King), row, 4);
+        addPiece(new Piece(colour, PieceType::Bishop), row, 5);
+        addPiece(new Piece(colour, PieceType::Knight), row, 6);
+        addPiece(new Piece(colour, PieceType::Rook), row, 7);
     };  // Lambda for repeat
 
-    setUpBackRow(Colour::White, 56);
     setUpBackRow(Colour::Black, 0);
+    setUpBackRow(Colour::White, 7);
 }
 
 void Board::clearBoard() {
-    for (int i = 0; i < 64; i++) {
-        removePiece(i);
+    for (int r = 0; r < 8; r++) {
+        for (int c = 0; c < 8; c++) {
+            removePiece(r, c);
+        }
     }
 }
 
-void Board::addPiece(Piece *piece, int square) {
-    board[square].setPiece(piece);
+void Board::addPiece(Piece *piece, int row, int column) {
+    board[row][column].setPiece(piece);
 }
 
-void Board::removePiece(int square) {
-    board[square].removePiece();
+void Board::removePiece(int row, int column) {
+    board[row][column].removePiece();
 }
 
 bool Board::checkBoard() {
@@ -58,7 +58,7 @@ void Board::displayBoard() {
         for (int r = 0; r < 8; r++) {
             std::cout << (char)('8' - r) << " ";  // Row numbers
             for (int c = 0; c < 8; c++) {
-                Piece *piece = (board[(r * 8) + c]).getPiece();
+                Piece *piece = (board[r][c]).getPiece();
                 if (piece == nullptr) {
                     std::cout << "-";
                 } else {
