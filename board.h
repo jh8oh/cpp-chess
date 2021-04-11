@@ -12,6 +12,7 @@ class Board {
     Board();   // Constructor (Set up board normally)
     ~Board();  // Destructor (Removes all piece memory from board)
 
+    void init();                              // Initializes board to default
     void clearBoard();                        // Empties the board completely
     void addPiece(Piece *piece, int square);  // Adds the specified piece to the specified square
     void removePiece(int square);             // Removes the piece on the specified square

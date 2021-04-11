@@ -3,6 +3,17 @@
 #include <iostream>
 
 Board::Board() {
+    init();
+}
+
+Board::~Board() {
+    clearBoard();
+}
+
+void Board::init() {
+    // Empty board
+    clearBoard();
+
     // Set pawns
     for (int i = 0; i < 8; i++) {
         addPiece(new Piece(Colour::White, PieceType::Pawn), 48 + i);
@@ -23,10 +34,6 @@ Board::Board() {
 
     setUpBackRow(Colour::White, 56);
     setUpBackRow(Colour::Black, 0);
-}
-
-Board::~Board() {
-    clearBoard();
 }
 
 void Board::clearBoard() {

@@ -8,8 +8,8 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     cin.exceptions(ios::eofbit | ios::failbit);
-    Board *board;
-    Game *game;
+    Board board;
+    Game game = Game(&(board), Colour::White);
     bool inPlay = false;   // Is the game currently being played
     bool inSetUp = false;  // Is the board currently being set up
 
@@ -19,26 +19,46 @@ int main(int argc, char *argv[]) {
             cin >> cmd;
             if (inPlay) {
                 // Game is currently being played
-
             } else if (inSetUp) {
+                if (cmd == "empty") {
+                    // Empties the board
+                    game.clearBoard();
+                } else if (cmd == "+") {
+                    // Places a piece in square
+                    char piece;
+                    string square;
+                    cin >> piece >> square;
+                    game.addPiece(piece, square);
+                } else if (cmd == "-") {
+                    // Removes a piece from the square
+                    string square;
+                    cin >> square;
+                    game.removePiece(square);
+                } else if (cmd == "=") {
+                    // Changes starting colour turn
+                    string colour;
+                    cin >> colour;
+                    game.setTurn(colour);
+                } else if (cmd == "done") {
+                    // Plays from this position if it's legal
+                    if (board->checkBoard()) {
+                        inSetUp = false;
+                        inPlay = true;
+                        board.displayBoard();
+                    }
+                } else if (cmd == "cancel") {
+                    // Stops set up mode
+                    inSetUp = false;
+                }
             } else {
                 if (cmd == "game") {
-                    // Starts the game with the board specified
+                    // Starts a new game
                     inPlay = true;
-                    if (game == nullptr) {
-                        board = new Board();
-                        game = new Game(board, Colour::White);
-                    }
-                    board->displayBoard();
-                    inPlay = true;
+                    board.init();
+                    board.displayBoard();
                 } else if (cmd == "setup") {
-                    // Set up the next game
-                    board = new Board();
-                    game = new Game(board, Colour::White);
+                    // Sets up a new game
                     inSetUp = true;
-                } else if (cmd == "clear") {
-                    // Clears the next game to default
-                    delete game;  // Deleting game also deletes the board
                 }
             }
         }
