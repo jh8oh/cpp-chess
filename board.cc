@@ -2,7 +2,11 @@
 
 #include <iostream>
 
-Board::Board() {}
+Board::Board() {
+    // Set up the square's observers
+    for (int i = 0; i < 64; i++) {
+    }
+}
 
 void Board::init() {
     // Empty board

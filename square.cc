@@ -21,3 +21,6 @@ void Square::setPiece(Piece *piece) {
 Piece *Square::getPiece() const {
     return piece;
 }
+
+void Square::notify(Subject<InfoType> &whoFrom) {
+}

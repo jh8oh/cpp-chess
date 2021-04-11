@@ -20,6 +20,9 @@ int main(int argc, char *argv[]) {
             cin >> cmd;
             if (inPlay) {
                 // Game is currently being played
+                if (cmd == "resign") {
+                } else if (cmd == "play") {
+                }
             } else if (inSetUp) {
                 if (cmd == "clear") {
                     // Empties the board
