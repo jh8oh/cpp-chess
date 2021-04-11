@@ -8,10 +8,6 @@
 #include "colour.h"
 #include "piece.h"
 
-class InvalidSquare {};
-class InvalidPiece {};
-class InvalidColour {};
-
 class Game {
     std::shared_ptr<Board> board;
     Colour turn;
@@ -28,6 +24,31 @@ class Game {
     void addPiece(char sPiece, std::string sSquare);  // Adds the parameter piece to the square indicated (Prints board afterwards)
     void removePiece(std::string sSquare);            // Removes a piece from the square indicated (Prints board afterwards)
     void setTurn(std::string sColour);                // Sets the next turn to be the colour indicated
+};
+
+// Exception classes
+class InvalidSquare {
+    std::string sSquare;
+
+   public:
+    InvalidSquare(std::string sSquare) : sSquare{sSquare} {}
+    std::string getInvalidSquare() const { return sSquare; }
+};
+
+class InvalidPiece {
+    std::string sPiece;
+
+   public:
+    InvalidPiece(std::string sPiece) : sPiece{sPiece} {}
+    std::string getInvalidPiece() const { return sPiece; }
+};
+
+class InvalidColour {
+    std::string sColour;
+
+   public:
+    InvalidColour(std::string sColour) : sColour{sColour} {}
+    std::string getInvalidColour() const { return sColour; }
 };
 
 #endif

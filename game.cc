@@ -8,7 +8,7 @@ Game::Game(std::shared_ptr<Board> board, Colour turn) : board{board}, turn{turn}
 int Game::getSquare(std::string sSquare) {
     // Checks if string is 2 characters long
     if (sSquare.legth() != 2) {
-        throw InvalidSquare{};
+        throw InvalidSquare{sSquare};
     }
 
     int row, column;
@@ -19,7 +19,7 @@ int Game::getSquare(std::string sSquare) {
 
     // Check if column and row are between 0 and 7
     if ((column < 0) || (column > 7) || (row < 0) || (row > 7)) {
-        throw InvalidSquare{};
+        throw InvalidSquare{sSquare};
     }
 
     return (row * 8) + column;
@@ -53,7 +53,7 @@ Piece *Game::getPiece(char sPiece) {
         case 'k':
             return new Piece(colour, PieceType::King);
         default:
-            throw InvalidPiece{};
+            throw InvalidPiece{sPiece};
     }
 }
 
@@ -66,7 +66,7 @@ Colour Game::getColour(std::string sColour) {
     } else if ((sColour == "b") || (sColour == "black")) {
         return Colour::Black;
     } else {
-        throw InvalidColour{};
+        throw InvalidColour{sColour};
     }
 }
 
@@ -81,10 +81,10 @@ void Game::addPiece(char sPiece, std::string sSquare) {
         int square = getSquare(sSquare);
         board->addPiece(piece, square);
         board->displayBoard();
-    } catch (InvalidPiece) {
-        std::cout << "Invalid piece: " << sPiece << std::endl;
-    } catch (InvalidSquare) {
-        std::cout << "Invalid square: " << sSquare << std::endl;
+    } catch (InvalidPiece e) {
+        std::cout << "Invalid piece: " << e.getInvalidPiece() << std::endl;
+    } catch (InvalidSquare e) {
+        std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
     }
 }
 
@@ -93,8 +93,8 @@ void Game::removePiece(std::string sSquare) {
         int square = getSquare(sSquare);
         board->removePiece(square);
         board->displayBoard();
-    } catch (InvalidSquare) {
-        std::cout << "Invalid square: " << sSquare << std::endl;
+    } catch (InvalidSquar e) {
+        std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
     }
 }
 
@@ -102,7 +102,7 @@ void Game::setTurn(std::string sColour) {
     try {
         Colour colour = getColour(sColour);
         turn = colour;
-    } catch (InvalidColour) {
-        std::cout << "Invalid colour: " << sColour << std::endl;
+    } catch (InvalidColour e) {
+        std::cout << "Invalid colour: " << e.getInvalidColour() << std::endl;
     }
 }
