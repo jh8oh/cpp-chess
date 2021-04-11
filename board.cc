@@ -2,13 +2,7 @@
 
 #include <iostream>
 
-Board::Board() {
-    init();
-}
-
-Board::~Board() {
-    clearBoard();
-}
+Board::Board() {}
 
 void Board::init() {
     // Empty board

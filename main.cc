@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include <string>
 
 using namespace std;
@@ -8,8 +9,8 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     cin.exceptions(ios::eofbit | ios::failbit);
-    Board board;
-    Game game = Game(&(board), Colour::White);
+    auto board = std::make_shared<Board>();
+    Game game = Game(board, Colour::White);
     bool inPlay = false;   // Is the game currently being played
     bool inSetUp = false;  // Is the board currently being set up
 
@@ -20,7 +21,7 @@ int main(int argc, char *argv[]) {
             if (inPlay) {
                 // Game is currently being played
             } else if (inSetUp) {
-                if (cmd == "empty") {
+                if (cmd == "clear") {
                     // Empties the board
                     game.clearBoard();
                 } else if (cmd == "+") {
@@ -44,7 +45,7 @@ int main(int argc, char *argv[]) {
                     if (board->checkBoard()) {
                         inSetUp = false;
                         inPlay = true;
-                        board.displayBoard();
+                        board->displayBoard();
                     }
                 } else if (cmd == "cancel") {
                     // Stops set up mode
@@ -54,8 +55,8 @@ int main(int argc, char *argv[]) {
                 if (cmd == "game") {
                     // Starts a new game
                     inPlay = true;
-                    board.init();
-                    board.displayBoard();
+                    board->init();
+                    board->displayBoard();
                 } else if (cmd == "setup") {
                     // Sets up a new game
                     inSetUp = true;

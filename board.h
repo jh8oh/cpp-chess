@@ -9,8 +9,7 @@ class Board {
     bool displayTextBased = true;  // Whether the board should be displayed with text or graphically
 
    public:
-    Board();   // Constructor (Set up board normally)
-    ~Board();  // Destructor (Removes all piece memory from board)
+    Board();  // Constructor (Set up board normally)
 
     void init();                              // Initializes board to default
     void clearBoard();                        // Empties the board completely

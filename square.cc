@@ -3,15 +3,18 @@
 Square::Square() {}
 
 Square::~Square() {
-    removePiece();
+    delete piece;
 }
 
 void Square::removePiece() {
     delete piece;
+    piece = nullptr;
 }
 
 void Square::setPiece(Piece *piece) {
-    removePiece();
+    if (this->piece != nullptr) {
+        removePiece();
+    }
     this->piece = piece;
 }
 

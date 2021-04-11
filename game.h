@@ -1,6 +1,7 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 
+#include <memory>
 #include <string>
 
 #include "board.h"
@@ -12,21 +13,20 @@ class InvalidPiece {};
 class InvalidColour {};
 
 class Game {
-    Board *board;
+    std::shared_ptr<Board> board;
     Colour turn;
 
     // Helper functions
-    int *getSquare(std::string sSquare);    // Returns the appropriate square index
+    int getSquare(std::string sSquare);     // Returns the appropriate square index
     Piece *getPiece(char sPiece);           // Returns the appropriate piece
     Colour getColour(std::string sColour);  // Returns the apporopriate enum colour
 
    public:
-    Game(Board *board, Colour turn);
-    ~Game();
+    Game(std::shared_ptr<Board> board, Colour turn);
 
-    void clearBoard();                                // Clears the board
-    void addPiece(char sPiece, std::string sSquare);  // Adds the parameter piece to the square indicated
-    void removePiece(std::string sSquare);            // Removes a piece from the square indicated
+    void clearBoard();                                // Clears the board (Prints board afterwards)
+    void addPiece(char sPiece, std::string sSquare);  // Adds the parameter piece to the square indicated (Prints board afterwards)
+    void removePiece(std::string sSquare);            // Removes a piece from the square indicated (Prints board afterwards)
     void setTurn(std::string sColour);                // Sets the next turn to be the colour indicated
 };
 

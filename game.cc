@@ -1,12 +1,16 @@
 #include "game.h"
 
-Game::Game(Board *board, Colour turn) : board{board}, turn{turn} {}
+#include <algorithm>
+#include <iostream>
 
-Game::~Game() {
-    delete board;
-}
+Game::Game(std::shared_ptr<Board> board, Colour turn) : board{board}, turn{turn} {}
 
 int Game::getSquare(std::string sSquare) {
+    // Checks if string is 2 characters long
+    if (sSquare.legth() != 2) {
+        throw InvalidSquare{};
+    }
+
     int row, column;
 
     // Converts characters to ASCII equivilent then remove the difference from 0.
@@ -53,7 +57,7 @@ Piece *Game::getPiece(char sPiece) {
     }
 }
 
-Colour ChessGame::getColour(std::string sColour) {
+Colour Game::getColour(std::string sColour) {
     // Lower cases every character
     std::transform(sColour.begin(), sColour.end(), sColour.begin(), ::tolower);
 
