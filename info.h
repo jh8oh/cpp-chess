@@ -5,17 +5,17 @@
 #include "square.h"
 
 /** Directions:
- *  1. North
- *  2. North-East
- *  3. East
- *  4. South-East
- *  5. South
- *  6. South-West
- *  7. West
- *  8. North-West
+ *  8 - North [1000]
+ *  4 - South [0100]
+ *  2 - East [0010]
+ *  1 - West [0001]
+ *  10 - North-East [1010]
+ *  9 - North-West [1001]
+ *  6 - South-East  [0110]
+ *  5 - South-West [0101]
 **/
 
-class Info {
+struct Info {
     Piece *piece;            // Piece on the current square
     int direction;           // Direction of the subject-observer line
     Square *originalSquare;  // Pointer to original square

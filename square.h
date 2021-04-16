@@ -1,11 +1,12 @@
 #ifndef _SQUARE_H_
 #define _SQUARE_H_
 
+#include "info.h"
 #include "observer.h"
 #include "piece.h"
 #include "subject.h"
 
-class Square : public Subject, public Observer {
+class Square : public Subject<Info>, public Observer<Info> {
     Piece *piece;
 
    public:

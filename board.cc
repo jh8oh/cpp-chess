@@ -4,6 +4,74 @@
 
 Board::Board() {
     // Set up the square's observers
+    for (int r = 0; r < 8; r++) {
+        for (int c = 0; c < 8; c++) {
+            // Check neighbours (for diagonal and straight)
+            int startPosX = (r = 0) ? r : r - 1;
+            int endPosX = (r = 7) ? r : r + 1;
+            int startPosY = (c = 0) ? c : c - 1;
+            int endPosY = (c = 7) ? c : c + 1;
+
+            for (int nr = startPosX; nr < endPosX; nr++) {
+                for (int nc = startPosY; nc < endPosY; nc++) {
+                    if ((nr != r) && (nc != c)) {
+                        int direction;
+
+                        if (nr = r - 1) {
+                            direction |= 8;  // Bitwise OR operator
+                        } else if (nr = r + 1) {
+                            direction |= 4;
+                        }
+
+                        if (nc = c - 1) {
+                            direction |= 2;
+                        } else if (nc = c + 1) {
+                            direction |= 1;
+                        }
+                    }
+
+                    (board[r][c]).attachNeighbour(direction, (board[nr][nc]));
+                }
+            }
+
+            // Get knight observers
+            if (r > 0) {
+                if (c > 1) {
+                    (board[r][c]).attachKnight(board[r - 1][c - 2]);
+                }
+                if (c < 6) {
+                    (board[r][c]).attachKnight(board[r - 1][c + 2]);
+                }
+
+                if (r > 1) {
+                    if (c > 0) {
+                        (board[r][c]).attachKnight(board[r - 2][c - 1]);
+                    }
+                    if (c < 7) {
+                        (board[r][c]).attachKnight(board[r - 2][c + 1]);
+                    }
+                }
+            }
+
+            if (r < 7) {
+                if (c > 1) {
+                    (board[r][c]).attachKnight(board[r + 1][c - 2]);
+                }
+                if (c < 6) {
+                    (board[r][c]).attachKnight(board[r + 1][c + 2]);
+                }
+
+                if (r < 6) {
+                    if (c > 0) {
+                        (board[r][c]).attachKnight(board[r + 2][c - 1]);
+                    }
+                    if (c < 7) {
+                        (board[r][c]).attachKnight(board[r + 2][c + 1]);
+                    }
+                }
+            }
+        }
+    }
 }
 
 void Board::init() {

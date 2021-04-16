@@ -1,13 +1,8 @@
 #include "subject.h"
 
 template <typename InfoType>
-void Subject<InfoType>::attachStraight(int direction, Observer<InfoType> *o) {
-    straightObservers[direction] = o;
-}
-
-template <typename InfoType>
-void Subject<InfoType>::attachDiagonal(int direction, Observer<InfoType> *o) {
-    diagonalObservers[direction] = o;
+void Subject<InfoType>::attachNeighbour(int direction, Observer<InfoType> *o) {
+    neighbourObservers[direction] = o;
 }
 
 template <typename InfoType>
@@ -18,8 +13,10 @@ void Subject<InfoType>::attachKnight(Observer<InfoType> *o) {
 template <typename InfoType>
 void Subject<InfoType>::notifyStraightObservers(int direction) {
     if (direction == 0) {
-        for (auto &ob : straightObservers) {
-            (ob.second)->notify(this);
+        for (auto &ob : neighbourObservers) {
+            if (isStraightObserver[ob.first]) {
+                (ob.second)->notify(this);
+            }
         }
     } else {
         (straightObservers[direction])->notify(this);
@@ -29,8 +26,10 @@ void Subject<InfoType>::notifyStraightObservers(int direction) {
 template <typename InfoType>
 void Subject<InfoType>::notifyDiagonalObservers(int direction) {
     if (direction == 0) {
-        for (auto &ob : diagonalObservers) {
-            (ob.second)->notify(this);
+        for (auto &ob : neighbourObservers) {
+            if (!isStraightObserver[ob.first]) {
+                (ob.second)->notify(this);
+            }
         }
     } else {
         (diagonalObservers[direction])->notify(this);
