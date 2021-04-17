@@ -1,15 +1,14 @@
-#ifndef _GAME_H_
-#define _GAME_H_
+#ifndef _CHESS_H_
+#define _CHESS_H_
 
-#include <memory>
 #include <string>
 
-#include "board.h"
 #include "colour.h"
 #include "piece.h"
+#include "square.h"
 
-class Game {
-    std::shared_ptr<Board> board;
+class Chess {
+    Square board[64];  // Board has 64 squares
     Colour turn;
 
     // Helper functions
@@ -17,13 +16,22 @@ class Game {
     Piece *getPiece(char sPiece);           // Returns the appropriate piece
     Colour getColour(std::string sColour);  // Returns the apporopriate enum colour
 
-   public:
-    Game(std::shared_ptr<Board> board, Colour turn);
+    // Board set up (no display)
+    void clearBoard();                        // Clears the board
+    void addPiece(Piece *piece, int square);  // Adds the specified piece to the specified square
+    void removePiece(int square);             // Removes the piece on the specified square
 
-    void clearBoard();                                // Clears the board (Prints board afterwards)
+   public:
+    void displayBoard();  // Prints board either graphically or text-based;
+
+    void init();  // Initializes board to default
+
+    // Set up
+    void clearBoardDisplay();                         // Clears the board (Prints board afterwards)
     void addPiece(char sPiece, std::string sSquare);  // Adds the parameter piece to the square indicated (Prints board afterwards)
     void removePiece(std::string sSquare);            // Removes a piece from the square indicated (Prints board afterwards)
     void setTurn(std::string sColour);                // Sets the next turn to be the colour indicated
+    bool checkBoard();                                // Checks whether the board is legal
 };
 
 // Exception classes
@@ -36,11 +44,11 @@ class InvalidSquare {
 };
 
 class InvalidPiece {
-    std::string sPiece;
+    char sPiece;
 
    public:
-    InvalidPiece(std::string sPiece) : sPiece{sPiece} {}
-    std::string getInvalidPiece() const { return sPiece; }
+    InvalidPiece(char sPiece) : sPiece{sPiece} {}
+    char getInvalidPiece() const { return sPiece; }
 };
 
 class InvalidColour {

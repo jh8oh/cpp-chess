@@ -4,13 +4,11 @@
 
 using namespace std;
 
-#include "board.h"
-#include "game.h"
+#include "chess.h"
 
 int main(int argc, char *argv[]) {
     cin.exceptions(ios::eofbit | ios::failbit);
-    auto board = std::make_shared<Board>();
-    Game game = Game(board, Colour::White);
+    Chess game = Chess();
     bool inPlay = false;   // Is the game currently being played
     bool inSetUp = false;  // Is the board currently being set up
 
@@ -23,7 +21,7 @@ int main(int argc, char *argv[]) {
             } else if (inSetUp) {
                 if (cmd == "clear") {
                     // Empties the board
-                    game.clearBoard();
+                    game.clearBoardDisplay();
                 } else if (cmd == "+") {
                     // Places a piece in square
                     char piece;
@@ -42,10 +40,10 @@ int main(int argc, char *argv[]) {
                     game.setTurn(colour);
                 } else if (cmd == "done") {
                     // Plays from this position if it's legal
-                    if (board->checkBoard()) {
+                    if (game.checkBoard()) {
                         inSetUp = false;
                         inPlay = true;
-                        board->displayBoard();
+                        game.displayBoard();
                     }
                 } else if (cmd == "cancel") {
                     // Stops set up mode
@@ -55,8 +53,8 @@ int main(int argc, char *argv[]) {
                 if (cmd == "game") {
                     // Starts a new game
                     inPlay = true;
-                    board->init();
-                    board->displayBoard();
+                    game.init();
+                    game.displayBoard();
                 } else if (cmd == "setup") {
                     // Sets up a new game
                     inSetUp = true;
