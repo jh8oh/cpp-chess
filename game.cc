@@ -7,7 +7,7 @@ Game::Game(std::shared_ptr<Board> board, Colour turn) : board{board}, turn{turn}
 
 int[] Game::getSquare(std::string sSquare) {
     // Checks if string is 2 characters long
-    if (sSquare.legth() != 2) {
+    if (sSquare.length() != 2) {
         throw InvalidSquare{sSquare};
     }
 
@@ -16,7 +16,7 @@ int[] Game::getSquare(std::string sSquare) {
 
     // Converts characters to ASCII equivilent then remove the difference from 0.
     square[0] = 7 - ((int)(sSquare.at(1) - '1'));  // Invert the row (since row '1' starts at the bottom)
-    square[1] = (int)(sSquare.at(0) - 'a');
+    square[1] = (int)(std::tolower(sSquare.at(0)) - 'a');
 
     // Check if column and row are between 0 and 7
     if ((column < 0) || (column > 7) || (row < 0) || (row > 7)) {
@@ -34,25 +34,19 @@ Piece *Game::getPiece(char sPiece) {
         colour = Colour::White;
     }
 
-    switch (sPiece) {
-        case 'P':
+    switch (std::tolower(sPiece)) {
         case 'p':
-            return new Piece(colour, PieceType::Pawn);
-        case 'B':
+            return new Pawn(colour);
         case 'b':
-            return new Piece(colour, PieceType::Bishop);
-        case 'N':
+            return new Bishop(colour);
         case 'n':
-            return new Piece(colour, PieceType::Knight);
-        case 'R':
+            return new Knight(colour);
         case 'r':
-            return new Piece(colour, PieceType::Rook);
-        case 'Q':
+            return new Rook(colour);
         case 'q':
-            return new Piece(colour, PieceType::Queen);
-        case 'K':
+            return new Queen(colour);
         case 'k':
-            return new Piece(colour, PieceType::King);
+            return new King(colour);
         default:
             throw InvalidPiece{sPiece};
     }

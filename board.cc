@@ -80,20 +80,20 @@ void Board::init() {
 
     // Set pawns
     for (int i = 0; i < 8; i++) {
-        addPiece(new Piece(Colour::Black, PieceType::Pawn), 1, i);
-        addPiece(new Piece(Colour::White, PieceType::Pawn), 6, i);
+        addPiece(new Pawn(Colour::Black), 1, i);
+        addPiece(new Pawn(Colour::White), 6, i);
     }
 
     // Set backrow
     auto setUpBackRow = [&](Colour colour, int row) {
-        addPiece(new Piece(colour, PieceType::Rook), row, 0);
-        addPiece(new Piece(colour, PieceType::Knight), row, 1);
-        addPiece(new Piece(colour, PieceType::Bishop), row, 2);
-        addPiece(new Piece(colour, PieceType::Queen), row, 3);
-        addPiece(new Piece(colour, PieceType::King), row, 4);
-        addPiece(new Piece(colour, PieceType::Bishop), row, 5);
-        addPiece(new Piece(colour, PieceType::Knight), row, 6);
-        addPiece(new Piece(colour, PieceType::Rook), row, 7);
+        addPiece(new Rook(colour), row, 0);
+        addPiece(new Knight(colour), row, 1);
+        addPiece(new Bishop(colour), row, 2);
+        addPiece(new Queen(colour), row, 3);
+        addPiece(new King(colour), row, 4);
+        addPiece(new Bishop(colour), row, 5);
+        addPiece(new Knight(colour), row, 6);
+        addPiece(new Rook(colour), row, 7);
     };  // Lambda for repeat
 
     setUpBackRow(Colour::Black, 0);
