@@ -5,7 +5,7 @@
 Piece::Piece(Colour colour, PieceType type) : colour{colour}, type{type} {}
 
 char Piece::getTextDisplay() const {
-    char displayText;
+    char displayText = '-';
 
     switch (type) {
         case PieceType::Pawn:
