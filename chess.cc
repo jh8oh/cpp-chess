@@ -23,7 +23,7 @@ int Chess::getSquare(std::string sSquare) {
     return (row * 8) + column;
 }
 
-std::shared_ptr<Piece> Chess::getPiece(char sPiece) {
+Piece *Chess::getPiece(char sPiece) {
     Colour colour;
     if (sPiece > 97) {
         colour = Colour::Black;  // ASCII lowercase
@@ -34,22 +34,22 @@ std::shared_ptr<Piece> Chess::getPiece(char sPiece) {
     switch (sPiece) {
         case 'P':
         case 'p':
-            return std::make_shared<Piece>(colour, PieceType::Pawn);
+            return new Piece(colour, PieceType::Pawn);
         case 'B':
         case 'b':
-            return std::make_shared<Piece>(colour, PieceType::Bishop);
+            return new Piece(colour, PieceType::Bishop);
         case 'N':
         case 'n':
-            return std::make_shared<Piece>(colour, PieceType::Knight);
+            return new Piece(colour, PieceType::Knight);
         case 'R':
         case 'r':
-            return std::make_shared<Piece>(colour, PieceType::Rook);
+            return new Piece(colour, PieceType::Rook);
         case 'Q':
         case 'q':
-            return std::make_shared<Piece>(colour, PieceType::Queen);
+            return new Piece(colour, PieceType::Queen);
         case 'K':
         case 'k':
-            return std::make_shared<Piece>(colour, PieceType::King);
+            return new Piece(colour, PieceType::King);
         default:
             throw InvalidPiece{sPiece};
     }
@@ -72,8 +72,8 @@ void Chess::displayBoard() {
     for (int r = 0; r < 8; r++) {
         std::cout << (char)('8' - r) << " ";  // Row numbers
         for (int c = 0; c < 8; c++) {
-            std::shared_ptr<Piece> piece = (board[(r * 8) + c]).getPiece();
-            if (piece.get() == nullptr) {
+            Piece *piece = board[(r * 8) + c];
+            if (piece == nullptr) {
                 std::cout << "-";
             } else {
                 std::cout << piece->getTextDisplay();
@@ -96,20 +96,20 @@ void Chess::init() {
 
     // Set pawns
     for (int i = 0; i < 8; i++) {
-        addPiece(std::make_shared<Piece>(Colour::White, PieceType::Pawn), 48 + i);
-        addPiece(std::make_shared<Piece>(Colour::Black, PieceType::Pawn), 8 + i);
+        addPiece(new Piece(Colour::White, PieceType::Pawn), 48 + i);
+        addPiece(new Piece(Colour::Black, PieceType::Pawn), 8 + i);
     }
 
     // Set backrow
     auto setUpBackRow = [&](Colour colour, int rowStart) {
-        addPiece(std::make_shared<Piece>(colour, PieceType::Rook), rowStart + 0);
-        addPiece(std::make_shared<Piece>(colour, PieceType::Knight), rowStart + 1);
-        addPiece(std::make_shared<Piece>(colour, PieceType::Bishop), rowStart + 2);
-        addPiece(std::make_shared<Piece>(colour, PieceType::Queen), rowStart + 3);
-        addPiece(std::make_shared<Piece>(colour, PieceType::King), rowStart + 4);
-        addPiece(std::make_shared<Piece>(colour, PieceType::Bishop), rowStart + 5);
-        addPiece(std::make_shared<Piece>(colour, PieceType::Knight), rowStart + 6);
-        addPiece(std::make_shared<Piece>(colour, PieceType::Rook), rowStart + 7);
+        addPiece(new Piece(colour, PieceType::Rook), rowStart + 0);
+        addPiece(new Piece(colour, PieceType::Knight), rowStart + 1);
+        addPiece(new Piece(colour, PieceType::Bishop), rowStart + 2);
+        addPiece(new Piece(colour, PieceType::Queen), rowStart + 3);
+        addPiece(new Piece(colour, PieceType::King), rowStart + 4);
+        addPiece(new Piece(colour, PieceType::Bishop), rowStart + 5);
+        addPiece(new Piece(colour, PieceType::Knight), rowStart + 6);
+        addPiece(new Piece(colour, PieceType::Rook), rowStart + 7);
     };  // Lambda for repeat
 
     setUpBackRow(Colour::White, 56);
@@ -127,13 +127,14 @@ void Chess::clearBoardDisplay() {
     displayBoard();
 }
 
-void Chess::addPiece(std::shared_ptr<Piece> piece, int square) {
-    board[square].setPiece(piece);
+void Chess::addPiece(Piece *piece, int square) {
+    delete board[square];
+    board[square] = piece;
 }
 
 void Chess::addPiece(char sPiece, std::string sSquare) {
     try {
-        std::shared_ptr<Piece> piece = getPiece(sPiece);
+        Piece *piece = getPiece(sPiece);
         int square = getSquare(sSquare);
         addPiece(piece, square);
         displayBoard();
@@ -145,7 +146,8 @@ void Chess::addPiece(char sPiece, std::string sSquare) {
 }
 
 void Chess::removePiece(int square) {
-    board[square].removePiece();
+    delete board[square];
+    board[square] = nullptr;
 }
 
 void Chess::removePiece(std::string sSquare) {
