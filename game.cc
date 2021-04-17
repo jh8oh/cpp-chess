@@ -74,7 +74,7 @@ void Game::addPiece(char sPiece, std::string sSquare) {
     try {
         Piece *piece = getPiece(sPiece);
         int[] square = getSquare(sSquare);
-        board->addPiece(piece, square[0], square[1]);
+        board->addPiece(piece, square);
         board->displayBoard();
     } catch (InvalidPiece e) {
         std::cout << "Invalid piece: " << e.getInvalidPiece() << std::endl;
@@ -86,9 +86,9 @@ void Game::addPiece(char sPiece, std::string sSquare) {
 void Game::removePiece(std::string sSquare) {
     try {
         int[] square = getSquare(sSquare);
-        board->removePiece(square[0], square[1]);
+        board->removePiece(square);
         board->displayBoard();
-    } catch (InvalidSquar e) {
+    } catch (InvalidSquare e) {
         std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
     }
 }

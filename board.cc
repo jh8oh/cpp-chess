@@ -6,7 +6,7 @@ Board::Board() {
     // Set up the square's observers
     for (int r = 0; r < 8; r++) {
         for (int c = 0; c < 8; c++) {
-            // Check neighbours (for diagonal and straight)
+            // Get neighbour observers (for diagonal and straight)
             int startPosX = (r = 0) ? r : r - 1;
             int endPosX = (r = 7) ? r : r + 1;
             int startPosY = (c = 0) ? c : c - 1;
@@ -108,11 +108,15 @@ void Board::clearBoard() {
     }
 }
 
-void Board::addPiece(Piece *piece, int row, int column) {
+void Board::addPiece(Piece *piece, int[] square) {
+    int row = square[0];
+    int column = square[1];
     board[row][column].setPiece(piece);
 }
 
-void Board::removePiece(int row, int column) {
+void Board::removePiece(int[] square) {
+    int row = square[0];
+    int column = square[1];
     board[row][column].removePiece();
 }
 
