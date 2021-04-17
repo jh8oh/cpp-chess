@@ -4,13 +4,16 @@
 #include "colour.h"
 
 class Piece {
-    Colour colour;
-    char displayText;  // Text to display
+    Colour colour;     // Piece colour
     bool promotable;   // Is pawn able to promote to this piece?
+    char displayText;  // Text to display
 
    public:
-    Piece(Colour colour);                 // Constructor
-    Colour getColour() const;             // Colour getter
+    Piece(Colour colour);  // Constructor
+
+    Colour getColour() const;    // Colour getter
+    bool getPromotable() const;  // Promotable getter
+
     virtual char getTextDisplay() const;  // Returns the text for display
 };
 

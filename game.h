@@ -24,6 +24,9 @@ class Game {
     void addPiece(char sPiece, std::string sSquare);  // Adds the parameter piece to the square indicated (Prints board afterwards)
     void removePiece(std::string sSquare);            // Removes a piece from the square indicated (Prints board afterwards)
     void setTurn(std::string sColour);                // Sets the next turn to be the colour indicated
+
+    bool move(std::string sStartSquare, std::string sEndSquare);  // Moves the piece on the start square to the end square
+    void promote(std::string sSquare, std::string sPromotion);    // Promotes the pawn on the square to the indicted promotion
 };
 
 // Exception classes
@@ -50,5 +53,9 @@ class InvalidColour {
     InvalidColour(std::string sColour) : sColour{sColour} {}
     std::string getInvalidColour() const { return sColour; }
 };
+
+class InvalidMove {};
+
+class InvalidPromotion {};
 
 #endif

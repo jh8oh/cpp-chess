@@ -101,3 +101,33 @@ void Game::setTurn(std::string sColour) {
         std::cout << "Invalid colour: " << e.getInvalidColour() << std::endl;
     }
 }
+
+bool Game::move(std::string sStartSquare, std::string sEndSquare) {
+    try {
+        int[] startSquare = getSquare(sStartSquare);
+        int[] endSquare = getSquare(sEndSquare);
+    } catch (InvalidSquare e) {
+        std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
+    } catch (InvalidMove) {
+        std::cout << "Invalid move" << std::endl;
+    }
+}
+
+void Game::promote(std::string sSquare, std::string sPromotion) {
+    try {
+        int[] square = getSquare(sSquare);
+        Piece *promotion = getPiece(sPromotion);
+
+        if (!(promotion->getPromotable())) {
+            throw InvalidPromotion{};
+        }
+
+        board->addPiece(square, promotion);
+    } catch (InvalidSquare e) {
+        // Shouldn't occur since the throw in the move function should hve caught it
+        std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
+    } catch (InvalidPiece e) {
+        std::cout << "Invalid piece: " << e.getInvalidPiece() << std::endl;
+        throw InvalidPromotion{};
+    }
+}
