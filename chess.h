@@ -1,6 +1,7 @@
 #ifndef _CHESS_H_
 #define _CHESS_H_
 
+#include <memory>
 #include <string>
 
 #include "colour.h"
@@ -12,14 +13,14 @@ class Chess {
     Colour turn;
 
     // Helper functions
-    int getSquare(std::string sSquare);     // Returns the appropriate square index
-    Piece *getPiece(char sPiece);           // Returns the appropriate piece
-    Colour getColour(std::string sColour);  // Returns the apporopriate enum colour
+    int getSquare(std::string sSquare);            // Returns the appropriate square index
+    std::shared_ptr<Piece> getPiece(char sPiece);  // Returns the appropriate piece
+    Colour getColour(std::string sColour);         // Returns the apporopriate enum colour
 
     // Board set up (no display)
-    void clearBoard();                        // Clears the board
-    void addPiece(Piece *piece, int square);  // Adds the specified piece to the specified square
-    void removePiece(int square);             // Removes the piece on the specified square
+    void clearBoard();                                        // Clears the board
+    void addPiece(std::shared_ptr<Piece> piece, int square);  // Adds the specified piece to the specified square
+    void removePiece(int square);                             // Removes the piece on the specified square
 
    public:
     void displayBoard();  // Prints board either graphically or text-based;

@@ -1,23 +1,16 @@
 #include "square.h"
 
-Square::Square() {}
-
-Square::~Square() {
-    delete piece;
-}
-
 void Square::removePiece() {
-    delete piece;
-    piece = nullptr;
+    piece.reset();
 }
 
-void Square::setPiece(Piece *piece) {
-    if (this->piece != nullptr) {
+void Square::setPiece(std::shared_ptr<Piece> piece) {
+    if ((this->piece).get() != nullptr) {
         removePiece();
     }
     this->piece = piece;
 }
 
-Piece *Square::getPiece() const {
+std::shared_ptr<Piece> Square::getPiece() const {
     return piece;
 }
