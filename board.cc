@@ -2,7 +2,77 @@
 
 #include <iostream>
 
-Board::Board() {}
+Board::Board() {
+    // Set up the square's observers
+    for (int r = 0; r < 8; r++) {
+        for (int c = 0; c < 8; c++) {
+            // Get neighbour observers (for diagonal and straight)
+            int startPosX = (r = 0) ? r : r - 1;
+            int endPosX = (r = 7) ? r : r + 1;
+            int startPosY = (c = 0) ? c : c - 1;
+            int endPosY = (c = 7) ? c : c + 1;
+
+            for (int nr = startPosX; nr < endPosX; nr++) {
+                for (int nc = startPosY; nc < endPosY; nc++) {
+                    if ((nr != r) && (nc != c)) {
+                        int direction;
+
+                        if (nr = r - 1) {
+                            direction |= 8;  // Bitwise OR operator
+                        } else if (nr = r + 1) {
+                            direction |= 4;
+                        }
+
+                        if (nc = c - 1) {
+                            direction |= 2;
+                        } else if (nc = c + 1) {
+                            direction |= 1;
+                        }
+                    }
+
+                    (board[r][c]).attachNeighbour(direction, (board[nr][nc]));
+                }
+            }
+
+            // Get knight observers
+            if (r > 0) {
+                if (c > 1) {
+                    (board[r][c]).attachKnight(board[r - 1][c - 2]);
+                }
+                if (c < 6) {
+                    (board[r][c]).attachKnight(board[r - 1][c + 2]);
+                }
+
+                if (r > 1) {
+                    if (c > 0) {
+                        (board[r][c]).attachKnight(board[r - 2][c - 1]);
+                    }
+                    if (c < 7) {
+                        (board[r][c]).attachKnight(board[r - 2][c + 1]);
+                    }
+                }
+            }
+
+            if (r < 7) {
+                if (c > 1) {
+                    (board[r][c]).attachKnight(board[r + 1][c - 2]);
+                }
+                if (c < 6) {
+                    (board[r][c]).attachKnight(board[r + 1][c + 2]);
+                }
+
+                if (r < 6) {
+                    if (c > 0) {
+                        (board[r][c]).attachKnight(board[r + 2][c - 1]);
+                    }
+                    if (c < 7) {
+                        (board[r][c]).attachKnight(board[r + 2][c + 1]);
+                    }
+                }
+            }
+        }
+    }
+}
 
 void Board::init() {
     // Empty board
@@ -10,38 +80,44 @@ void Board::init() {
 
     // Set pawns
     for (int i = 0; i < 8; i++) {
-        addPiece(new Piece(Colour::White, PieceType::Pawn), 48 + i);
-        addPiece(new Piece(Colour::Black, PieceType::Pawn), 8 + i);
+        addPiece(std::make_shared<Piece>(Pawn(Colour::Black)), 1, i);
+        addPiece(std::make_shared<Piece>(Pawn(Colour::White)), 6, i);
     }
 
     // Set backrow
-    auto setUpBackRow = [&](Colour colour, int rowStart) {
-        addPiece(new Piece(colour, PieceType::Rook), rowStart + 0);
-        addPiece(new Piece(colour, PieceType::Knight), rowStart + 1);
-        addPiece(new Piece(colour, PieceType::Bishop), rowStart + 2);
-        addPiece(new Piece(colour, PieceType::Queen), rowStart + 3);
-        addPiece(new Piece(colour, PieceType::King), rowStart + 4);
-        addPiece(new Piece(colour, PieceType::Bishop), rowStart + 5);
-        addPiece(new Piece(colour, PieceType::Knight), rowStart + 6);
-        addPiece(new Piece(colour, PieceType::Rook), rowStart + 7);
+    auto setUpBackRow = [&](Colour colour, int row) {
+        addPiece(std::make_shared<Piece>(Rook(colour)), row, 0);
+        addPiece(std::make_shared<Piece>(Knight(colour)), row, 1);
+        addPiece(std::make_shared<Piece>(Bishop(colour)), row, 2);
+        addPiece(std::make_shared<Piece>(Queen(colour)), row, 3);
+        addPiece(std::make_shared<Piece>(King(colour)), row, 4);
+        addPiece(std::make_shared<Piece>(Bishop(colour)), row, 5);
+        addPiece(std::make_shared<Piece>(Knight(colour)), row, 6);
+        addPiece(std::make_shared<Piece>(Rook(colour)), row, 7);
     };  // Lambda for repeat
 
-    setUpBackRow(Colour::White, 56);
     setUpBackRow(Colour::Black, 0);
+    setUpBackRow(Colour::White, 7);
 }
 
 void Board::clearBoard() {
-    for (int i = 0; i < 64; i++) {
-        removePiece(i);
+    for (int r = 0; r < 8; r++) {
+        for (int c = 0; c < 8; c++) {
+            removePiece(r, c);
+        }
     }
 }
 
-void Board::addPiece(Piece *piece, int square) {
-    board[square].setPiece(piece);
+void Board::addPiece(std::shared_ptr<Piece> piece, int[] square) {
+    int row = square[0];
+    int column = square[1];
+    board[row][column].setPiece(piece);
 }
 
-void Board::removePiece(int square) {
-    board[square].removePiece();
+void Board::removePiece(int[] square) {
+    int row = square[0];
+    int column = square[1];
+    board[row][column].removePiece();
 }
 
 bool Board::checkBoard() {
@@ -49,12 +125,22 @@ bool Board::checkBoard() {
     return true;
 }
 
+bool Board::checkLegalMove(int[] startSquare, int[] endSquare) {
+}
+
+void Board::move(int[] startSquare, int[] endSquare) {
+    checkLegalMove(startSquare, endSquare);
+
+    // Not throw yet therefore legal
+    board[endSquare[0]][endSquare[1]].setPiece(board[startSquare[0]][startSquare[1]].getPiece());
+}
+
 void Board::displayBoard() {
     if (displayTextBased) {
         for (int r = 0; r < 8; r++) {
             std::cout << (char)('8' - r) << " ";  // Row numbers
             for (int c = 0; c < 8; c++) {
-                Piece *piece = (board[(r * 8) + c]).getPiece();
+                Piece *piece = (board[r][c]).getPiece();
                 if (piece == nullptr) {
                     std::cout << "-";
                 } else {

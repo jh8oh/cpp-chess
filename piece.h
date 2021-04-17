@@ -3,23 +3,74 @@
 
 #include "colour.h"
 
-enum class PieceType {
-    Pawn,
-    Knight,
-    Bishop,
-    Rook,
-    Queen,
-    King
-};
-
 class Piece {
-    Colour colour;
-    PieceType type;
+    Colour colour;     // Piece colour
+    bool promotable;   // Is pawn able to promote to this piece?
+    char displayText;  // Text to display
 
    public:
-    Piece(Colour colour, PieceType type);
+    Piece(Colour colour);  // Constructor
 
-    char getTextDisplay() const;
+    Colour getColour() const;    // Colour getter
+    bool getPromotable() const;  // Promotable getter
+
+    virtual char getTextDisplay() const;  // Returns the text for display
+};
+
+class Pawn : public Piece {
+    displayText = 'p';
+    promotable = false;
+
+   public:
+    Pawn(Colour colour);
+};
+
+class Knight : public Piece {
+    displayText = 'n';
+    promotable = true;
+
+   public:
+    Knight(Colour colour);
+};
+
+class Bishop : public Piece {
+    displayText = 'b';
+    promotable = true;
+
+   public:
+    Bishop(Colour colour);
+};
+
+class Rook : public Piece {
+    displayText = 'r';
+    promotable = true;
+    bool moved;
+
+   public:
+    Rook(Colour colour);
+
+    void setMoved(bool moved);
+    bool getMoved() const;
+};
+
+class Queen : public Piece {
+    displayText = 'q';
+    promotable = true;
+
+   public:
+    Queen(Colour colour);
+};
+
+class King : public Piece {
+    displayText = 'k';
+    promotable = false;
+    bool moved;
+
+   public:
+    King(Colour colour);
+
+    void setMoved(bool moved);
+    bool getMoved() const;
 };
 
 #endif

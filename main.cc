@@ -20,6 +20,27 @@ int main(int argc, char *argv[]) {
             cin >> cmd;
             if (inPlay) {
                 // Game is currently being played
+                if (cmd == "resign") {
+                } else if (cmd == "move") {
+                    // Moves a piece to a square
+                    string startSquare, endSquare;
+                    cin >> startSquare >> endSquare;
+
+                    if (game.move(startSquare, endSquare)) {
+                        // If promotion is needed:
+                        cout << "Promote " << endSquare << " pawn to..." << endl;
+                        while (true) {
+                            try {
+                                char promotion;
+                                cin >> promotion;
+                                game.promote(endSquare, promotion);
+                                break;
+                            } catch (InvalidPromotion) {
+                                cout << "Invalid promotion" << endl;
+                            }
+                        }
+                    }
+                }
             } else if (inSetUp) {
                 if (cmd == "clear") {
                     // Empties the board
