@@ -68,76 +68,17 @@ Colour Chess::getColour(std::string sColour) {
     }
 }
 
-void Chess::displayBoard() {
-    for (int r = 0; r < 8; r++) {
-        std::cout << (char)('8' - r) << " ";  // Row numbers
-        for (int c = 0; c < 8; c++) {
-            Piece *piece = board[(r * 8) + c];
-            if (piece == nullptr) {
-                std::cout << "-";
-            } else {
-                std::cout << piece->getTextDisplay();
-            }
-        }
-        std::cout << std::endl;
-    }
-
-    // Column letters
-    std::cout << "  ";  // 2 spaces to match row number offset
-    for (int i = 0; i < 8; i++) {
-        std::cout << (char)('a' + i);
-    }
-    std::cout << std::endl;
-}
-
-void Chess::init() {
-    // Empty board
-    clearBoard();
-
-    // Set pawns
-    for (int i = 0; i < 8; i++) {
-        addPiece(new Piece(Colour::White, PieceType::Pawn), 48 + i);
-        addPiece(new Piece(Colour::Black, PieceType::Pawn), 8 + i);
-    }
-
-    // Set backrow
-    auto setUpBackRow = [&](Colour colour, int rowStart) {
-        addPiece(new Piece(colour, PieceType::Rook), rowStart + 0);
-        addPiece(new Piece(colour, PieceType::Knight), rowStart + 1);
-        addPiece(new Piece(colour, PieceType::Bishop), rowStart + 2);
-        addPiece(new Piece(colour, PieceType::Queen), rowStart + 3);
-        addPiece(new Piece(colour, PieceType::King), rowStart + 4);
-        addPiece(new Piece(colour, PieceType::Bishop), rowStart + 5);
-        addPiece(new Piece(colour, PieceType::Knight), rowStart + 6);
-        addPiece(new Piece(colour, PieceType::Rook), rowStart + 7);
-    };  // Lambda for repeat
-
-    setUpBackRow(Colour::White, 56);
-    setUpBackRow(Colour::Black, 0);
-}
-
 void Chess::clearBoard() {
-    for (int i = 0; i < 64; i++) {
-        removePiece(i);
-    }
-}
-
-void Chess::clearBoardDisplay() {
-    clearBoard();
+    board.clearBoard();
     displayBoard();
-}
-
-void Chess::addPiece(Piece *piece, int square) {
-    delete board[square];
-    board[square] = piece;
 }
 
 void Chess::addPiece(char sPiece, std::string sSquare) {
     try {
         Piece *piece = getPiece(sPiece);
         int square = getSquare(sSquare);
-        addPiece(piece, square);
-        displayBoard();
+        board.addPiece(piece, square);
+        board.displayBoard();
     } catch (InvalidPiece e) {
         std::cout << "Invalid piece: " << e.getInvalidPiece() << std::endl;
     } catch (InvalidSquare e) {
@@ -145,16 +86,11 @@ void Chess::addPiece(char sPiece, std::string sSquare) {
     }
 }
 
-void Chess::removePiece(int square) {
-    delete board[square];
-    board[square] = nullptr;
-}
-
 void Chess::removePiece(std::string sSquare) {
     try {
         int square = getSquare(sSquare);
-        removePiece(square);
-        displayBoard();
+        board.removePiece(square);
+        board.displayBoard();
     } catch (InvalidSquare e) {
         std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
     }
@@ -170,6 +106,5 @@ void Chess::setTurn(std::string sColour) {
 }
 
 bool Chess::checkBoard() {
-    // TODO Check if board is legal
-    return true;
+    return board.checkBoard();
 }
