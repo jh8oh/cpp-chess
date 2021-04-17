@@ -80,20 +80,20 @@ void Board::init() {
 
     // Set pawns
     for (int i = 0; i < 8; i++) {
-        addPiece(new Pawn(Colour::Black), 1, i);
-        addPiece(new Pawn(Colour::White), 6, i);
+        addPiece(std::make_shared<Piece>(Pawn(Colour::Black)), 1, i);
+        addPiece(std::make_shared<Piece>(Pawn(Colour::White)), 6, i);
     }
 
     // Set backrow
     auto setUpBackRow = [&](Colour colour, int row) {
-        addPiece(new Rook(colour), row, 0);
-        addPiece(new Knight(colour), row, 1);
-        addPiece(new Bishop(colour), row, 2);
-        addPiece(new Queen(colour), row, 3);
-        addPiece(new King(colour), row, 4);
-        addPiece(new Bishop(colour), row, 5);
-        addPiece(new Knight(colour), row, 6);
-        addPiece(new Rook(colour), row, 7);
+        addPiece(std::make_shared<Piece>(Rook(colour)), row, 0);
+        addPiece(std::make_shared<Piece>(Knight(colour)), row, 1);
+        addPiece(std::make_shared<Piece>(Bishop(colour)), row, 2);
+        addPiece(std::make_shared<Piece>(Queen(colour)), row, 3);
+        addPiece(std::make_shared<Piece>(King(colour)), row, 4);
+        addPiece(std::make_shared<Piece>(Bishop(colour)), row, 5);
+        addPiece(std::make_shared<Piece>(Knight(colour)), row, 6);
+        addPiece(std::make_shared<Piece>(Rook(colour)), row, 7);
     };  // Lambda for repeat
 
     setUpBackRow(Colour::Black, 0);
@@ -108,7 +108,7 @@ void Board::clearBoard() {
     }
 }
 
-void Board::addPiece(Piece *piece, int[] square) {
+void Board::addPiece(std::shared_ptr<Piece> piece, int[] square) {
     int row = square[0];
     int column = square[1];
     board[row][column].setPiece(piece);

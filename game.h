@@ -13,9 +13,9 @@ class Game {
     Colour turn;
 
     // Helper functions
-    int[] getSquare(std::string sSquare);   // Returns the appropriate square index
-    Piece *getPiece(char sPiece);           // Returns the appropriate piece
-    Colour getColour(std::string sColour);  // Returns the apporopriate enum colour
+    int[] getSquare(std::string sSquare);           // Returns the appropriate square index
+    std::shared_ptr<Piece> *getPiece(char sPiece);  // Returns the appropriate piece
+    Colour getColour(std::string sColour);          // Returns the apporopriate enum colour
 
    public:
     Game(std::shared_ptr<Board> board, Colour turn);

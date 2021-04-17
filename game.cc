@@ -26,7 +26,7 @@ int[] Game::getSquare(std::string sSquare) {
     return square;
 }
 
-Piece *Game::getPiece(char sPiece) {
+std::shared_ptr<Piece> Game::getPiece(char sPiece) {
     Colour colour;
     if (sPiece > 97) {
         colour = Colour::Black;  // ASCII lowercase
@@ -36,17 +36,17 @@ Piece *Game::getPiece(char sPiece) {
 
     switch (std::tolower(sPiece)) {
         case 'p':
-            return new Pawn(colour);
+            return std::make_shared<Piece>(Pawn(colour));
         case 'b':
-            return new Bishop(colour);
+            return std::make_shared<Piece>(Bishop(colour));
         case 'n':
-            return new Knight(colour);
+            return std::make_shared<Piece>(Knight(colour));
         case 'r':
-            return new Rook(colour);
+            return std::make_shared<Piece>(Rook(colour));
         case 'q':
-            return new Queen(colour);
+            return std::make_shared<Piece>(Queen(colour));
         case 'k':
-            return new King(colour);
+            return std::make_shared<Piece>(King(colour));
         default:
             throw InvalidPiece{sPiece};
     }
@@ -72,7 +72,7 @@ void Game::clearBoard() {
 
 void Game::addPiece(char sPiece, std::string sSquare) {
     try {
-        Piece *piece = getPiece(sPiece);
+        shared_ptr<Piece> piece = getPiece(sPiece);
         int[] square = getSquare(sSquare);
         board->addPiece(piece, square);
         board->displayBoard();
@@ -117,7 +117,7 @@ bool Game::move(std::string sStartSquare, std::string sEndSquare) {
 void Game::promote(std::string sSquare, std::string sPromotion) {
     try {
         int[] square = getSquare(sSquare);
-        Piece *promotion = getPiece(sPromotion);
+        std::shared_ptr<Piece> promotion = getPiece(sPromotion);
 
         if (!(promotion->getPromotable())) {
             throw InvalidPromotion{};
