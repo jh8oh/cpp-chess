@@ -106,6 +106,7 @@ bool Game::move(std::string sStartSquare, std::string sEndSquare) {
     try {
         int[] startSquare = getSquare(sStartSquare);
         int[] endSquare = getSquare(sEndSquare);
+        board->move(startSquare, endSquare);
     } catch (InvalidSquare e) {
         std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
     } catch (InvalidMove) {

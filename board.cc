@@ -125,6 +125,16 @@ bool Board::checkBoard() {
     return true;
 }
 
+bool Board::checkLegalMove(int[] startSquare, int[] endSquare) {
+}
+
+void Board::move(int[] startSquare, int[] endSquare) {
+    checkLegalMove(startSquare, endSquare);
+
+    // Not throw yet therefore legal
+    board[endSquare[0]][endSquare[1]].setPiece(board[startSquare[0]][startSquare[1]].getPiece());
+}
+
 void Board::displayBoard() {
     if (displayTextBased) {
         for (int r = 0; r < 8; r++) {

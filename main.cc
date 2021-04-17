@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 
                     if (game.move(startSquare, endSquare)) {
                         // If promotion is needed:
-                        cout << "Promote " << endSquare << "pawn to..." << endl;
+                        cout << "Promote " << endSquare << " pawn to..." << endl;
                         while (true) {
                             try {
                                 char promotion;

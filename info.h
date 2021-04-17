@@ -16,8 +16,9 @@
 **/
 
 struct Info {
-    Piece *piece;            // Piece on the current square
-    int direction;           // Direction of the subject-observer line
+    int amount;     // Amount to go in the direction of the subject-observer line
+    int direction;  // Direction of the subject-observer line
+
     Square *originalSquare;  // Pointer to original square
 };
 
