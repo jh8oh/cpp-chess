@@ -39,18 +39,18 @@ class Board {
 };
 
 // Exception classes
-enum class Reason {
+enum class InvalidMoveReason {
     NotExist,
     WrongColour,
     EndSquare
 };
 
 class InvalidMove {
-    Reason reason;
+    InvalidMoveReason reason;
 
    public:
-    InvalidMove(Reason reason) : reason{reason} {}
-    Reason getReason() const { return reason; }
+    InvalidMove(InvalidMoveReason reason) : reason{reason} {}
+    InvalidMoveReason getReason() const { return reason; }
 };
 
 class InvalidBoard {};

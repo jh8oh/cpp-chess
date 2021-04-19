@@ -128,12 +128,12 @@ bool Chess::move(std::string sStartSquare, std::string sEndSquare) {
     } catch (InvalidSquare e) {
         std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
     } catch (InvalidMove e) {
-        if (e.getReason() == Reason::NotExist) {
+        if (e.getReason() == InvalidMoveReason::NotExist) {
             std::cout << "There are no pieces on " << sStartSquare << std::endl;
-        } else if (e.getReason() == Reason::WrongColour) {
+        } else if (e.getReason() == InvalidMoveReason::WrongColour) {
             std::cout << "Piece on " << sStartSquare << " is not the current turn's colour" << std::endl;
         } else {
-            std::cout << "Piece on " << sStartSquare << "is unable to reach " << sEndSquare << std::endl;
+            std::cout << "Piece on " << sStartSquare << " is unable to reach " << sEndSquare << std::endl;
         }
     }
 
