@@ -28,8 +28,8 @@ class Chess {
     bool checkBoard();                                // Checks whether the board is legal
 
     // Play
-    bool move(std::string sStartSquare, std::string sEndSquare);
-    void promote(std::string sSquare, char sPromotion);
+    bool move(std::string sStartSquare, std::string sEndSquare);  // Moves piece on start square to end square if legal (returns true if promotion needed)
+    bool promote(std::string sSquare, char sPromotion);           // Promotes the piece on square to the promotion (returns true if successful)
 };
 
 // Exception classes

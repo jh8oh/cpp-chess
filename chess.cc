@@ -141,7 +141,7 @@ bool Chess::move(std::string sStartSquare, std::string sEndSquare) {
     return false;
 }
 
-void Chess::promote(std::string sSquare, char sPromotion) {
+bool Chess::promote(std::string sSquare, char sPromotion) {
     try {
         int square = getSquare(sSquare);
         Piece *promotion = getPiece((turn == Colour::White) ? std::toupper(sPromotion) : std::tolower(sPromotion));
@@ -153,9 +153,12 @@ void Chess::promote(std::string sSquare, char sPromotion) {
 
         board.addPiece(promotion, square);
         board.displayBoard();
+        return true;
     } catch (InvalidSquare e) {
         std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
     } catch (InvalidPiece e) {
         std::cout << "Invalid piece: " << e.getInvalidPiece() << std::endl;
     }
+
+    return false;
 }

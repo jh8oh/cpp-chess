@@ -416,12 +416,12 @@ std::vector<Move> Board::getMoves(int square) {
 bool Board::move(int startSquare, int endSquare, Colour turn) {
     // Check if piece on the board exists
     if (board[startSquare] == nullptr) {
-        throw InvalidMove(Reason::NotExist);
+        throw InvalidMove(InvalidMoveReason::NotExist);
     }
 
     // Check if piece on the board is the same colour as the turn
     if (board[startSquare]->getColour() != turn) {
-        throw InvalidMove(Reason::WrongColour);
+        throw InvalidMove(InvalidMoveReason::WrongColour);
     }
 
     std::vector<Move> moves = getMoves(startSquare);
@@ -463,7 +463,7 @@ bool Board::move(int startSquare, int endSquare, Colour turn) {
             }
         }
     } else {
-        throw InvalidMove(Reason::EndSquare);
+        throw InvalidMove(InvalidMoveReason::EndSquare);
     }
 
     return false;
