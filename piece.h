@@ -15,11 +15,17 @@ enum class PieceType {
 class Piece {
     Colour colour;
     PieceType type;
+    bool moved = false;  // Used for King and Rook to check if piece has moved
 
    public:
     Piece(Colour colour, PieceType type);
 
     char getTextDisplay() const;
+
+    Colour getColour() const;
+    PieceType getType() const;
+    bool getMoved() const;
+    void pieceMoved();
 };
 
 #endif

@@ -30,3 +30,19 @@ char Piece::getTextDisplay() const {
 
     return (colour == Colour::White) ? std::toupper(displayText) : displayText;
 }
+
+Colour Piece::getColour() const {
+    return colour;
+}
+
+PieceType Piece::getType() const {
+    return type;
+}
+
+bool Piece::getMoved() const {
+    return moved;
+}
+
+void Piece::pieceMoved() {
+    moved = true;
+}

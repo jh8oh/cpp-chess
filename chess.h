@@ -1,38 +1,34 @@
 #ifndef _CHESS_H_
 #define _CHESS_H_
 
-#include <memory>
 #include <string>
 
+#include "board.h"
 #include "colour.h"
 #include "piece.h"
-#include "square.h"
 
 class Chess {
-    Square board[64];  // Board has 64 squares
+    Board board;
     Colour turn;
 
     // Helper functions
-    int getSquare(std::string sSquare);            // Returns the appropriate square index
-    std::shared_ptr<Piece> getPiece(char sPiece);  // Returns the appropriate piece
-    Colour getColour(std::string sColour);         // Returns the apporopriate enum colour
-
-    // Board set up (no display)
-    void clearBoard();                                        // Clears the board
-    void addPiece(std::shared_ptr<Piece> piece, int square);  // Adds the specified piece to the specified square
-    void removePiece(int square);                             // Removes the piece on the specified square
+    int getSquare(std::string sSquare);     // Returns the appropriate square index
+    Piece *getPiece(char sPiece);           // Returns the appropriate piece
+    Colour getColour(std::string sColour);  // Returns the apporopriate enum colour
 
    public:
-    void displayBoard();  // Prints board either graphically or text-based;
-
-    void init();  // Initializes board to default
+    void init();
 
     // Set up
-    void clearBoardDisplay();                         // Clears the board (Prints board afterwards)
+    void clearBoard();                                // Clears the board (Prints board afterwards)
     void addPiece(char sPiece, std::string sSquare);  // Adds the parameter piece to the square indicated (Prints board afterwards)
     void removePiece(std::string sSquare);            // Removes a piece from the square indicated (Prints board afterwards)
     void setTurn(std::string sColour);                // Sets the next turn to be the colour indicated
     bool checkBoard();                                // Checks whether the board is legal
+
+    // Play
+    bool move(std::string sStartSquare, std::string sEndSquare);
+    void promote(std::string sSquare, char sPromotion);
 };
 
 // Exception classes
@@ -59,5 +55,7 @@ class InvalidColour {
     InvalidColour(std::string sColour) : sColour{sColour} {}
     std::string getInvalidColour() const { return sColour; }
 };
+
+class InvalidPromotion {};
 
 #endif

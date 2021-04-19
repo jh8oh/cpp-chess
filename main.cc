@@ -18,10 +18,31 @@ int main(int argc, char *argv[]) {
             cin >> cmd;
             if (inPlay) {
                 // Game is currently being played
+                if (cmd == "resign") {
+                } else if (cmd == "move") {
+                    // Moves a piece to a square
+                    string startSquare, endSquare;
+                    cin >> startSquare >> endSquare;
+
+                    if (game.move(startSquare, endSquare)) {
+                        // If promotion is needed:
+                        cout << "Promote " << endSquare << " pawn to..." << endl;
+                        while (true) {
+                            char promotion;
+                            try {
+                                cin >> promotion;
+                                game.promote(endSquare, promotion);
+                                break;
+                            } catch (InvalidPromotion) {
+                                cout << "Invalid promotion: " << promotion << endl;
+                            }
+                        }
+                    }
+                }
             } else if (inSetUp) {
                 if (cmd == "clear") {
                     // Empties the board
-                    game.clearBoardDisplay();
+                    game.clearBoard();
                 } else if (cmd == "+") {
                     // Places a piece in square
                     char piece;
@@ -43,7 +64,6 @@ int main(int argc, char *argv[]) {
                     if (game.checkBoard()) {
                         inSetUp = false;
                         inPlay = true;
-                        game.displayBoard();
                     }
                 } else if (cmd == "cancel") {
                     // Stops set up mode
@@ -54,7 +74,6 @@ int main(int argc, char *argv[]) {
                     // Starts a new game
                     inPlay = true;
                     game.init();
-                    game.displayBoard();
                 } else if (cmd == "setup") {
                     // Sets up a new game
                     inSetUp = true;

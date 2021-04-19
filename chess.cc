@@ -6,7 +6,7 @@
 int Chess::getSquare(std::string sSquare) {
     // Checks if string is 2 characters long
     if (sSquare.length() != 2) {
-        throw InvalidSquare{sSquare};
+        throw InvalidSquare(sSquare);
     }
 
     int row, column;
@@ -17,13 +17,13 @@ int Chess::getSquare(std::string sSquare) {
 
     // Check if column and row are between 0 and 7
     if ((column < 0) || (column > 7) || (row < 0) || (row > 7)) {
-        throw InvalidSquare{sSquare};
+        throw InvalidSquare(sSquare);
     }
 
     return (row * 8) + column;
 }
 
-std::shared_ptr<Piece> Chess::getPiece(char sPiece) {
+Piece *Chess::getPiece(char sPiece) {
     Colour colour;
     if (sPiece > 97) {
         colour = Colour::Black;  // ASCII lowercase
@@ -34,24 +34,24 @@ std::shared_ptr<Piece> Chess::getPiece(char sPiece) {
     switch (sPiece) {
         case 'P':
         case 'p':
-            return std::make_shared<Piece>(colour, PieceType::Pawn);
+            return new Piece(colour, PieceType::Pawn);
         case 'B':
         case 'b':
-            return std::make_shared<Piece>(colour, PieceType::Bishop);
+            return new Piece(colour, PieceType::Bishop);
         case 'N':
         case 'n':
-            return std::make_shared<Piece>(colour, PieceType::Knight);
+            return new Piece(colour, PieceType::Knight);
         case 'R':
         case 'r':
-            return std::make_shared<Piece>(colour, PieceType::Rook);
+            return new Piece(colour, PieceType::Rook);
         case 'Q':
         case 'q':
-            return std::make_shared<Piece>(colour, PieceType::Queen);
+            return new Piece(colour, PieceType::Queen);
         case 'K':
         case 'k':
-            return std::make_shared<Piece>(colour, PieceType::King);
+            return new Piece(colour, PieceType::King);
         default:
-            throw InvalidPiece{sPiece};
+            throw InvalidPiece(sPiece);
     }
 }
 
@@ -64,79 +64,27 @@ Colour Chess::getColour(std::string sColour) {
     } else if ((sColour == "b") || (sColour == "black")) {
         return Colour::Black;
     } else {
-        throw InvalidColour{sColour};
+        throw InvalidColour(sColour);
     }
-}
-
-void Chess::displayBoard() {
-    for (int r = 0; r < 8; r++) {
-        std::cout << (char)('8' - r) << " ";  // Row numbers
-        for (int c = 0; c < 8; c++) {
-            std::shared_ptr<Piece> piece = (board[(r * 8) + c]).getPiece();
-            if (piece.get() == nullptr) {
-                std::cout << "-";
-            } else {
-                std::cout << piece->getTextDisplay();
-            }
-        }
-        std::cout << std::endl;
-    }
-
-    // Column letters
-    std::cout << "  ";  // 2 spaces to match row number offset
-    for (int i = 0; i < 8; i++) {
-        std::cout << (char)('a' + i);
-    }
-    std::cout << std::endl;
 }
 
 void Chess::init() {
-    // Empty board
-    clearBoard();
-
-    // Set pawns
-    for (int i = 0; i < 8; i++) {
-        addPiece(std::make_shared<Piece>(Colour::White, PieceType::Pawn), 48 + i);
-        addPiece(std::make_shared<Piece>(Colour::Black, PieceType::Pawn), 8 + i);
-    }
-
-    // Set backrow
-    auto setUpBackRow = [&](Colour colour, int rowStart) {
-        addPiece(std::make_shared<Piece>(colour, PieceType::Rook), rowStart + 0);
-        addPiece(std::make_shared<Piece>(colour, PieceType::Knight), rowStart + 1);
-        addPiece(std::make_shared<Piece>(colour, PieceType::Bishop), rowStart + 2);
-        addPiece(std::make_shared<Piece>(colour, PieceType::Queen), rowStart + 3);
-        addPiece(std::make_shared<Piece>(colour, PieceType::King), rowStart + 4);
-        addPiece(std::make_shared<Piece>(colour, PieceType::Bishop), rowStart + 5);
-        addPiece(std::make_shared<Piece>(colour, PieceType::Knight), rowStart + 6);
-        addPiece(std::make_shared<Piece>(colour, PieceType::Rook), rowStart + 7);
-    };  // Lambda for repeat
-
-    setUpBackRow(Colour::White, 56);
-    setUpBackRow(Colour::Black, 0);
+    turn = Colour::White;
+    board.init();
+    board.displayBoard();
 }
 
 void Chess::clearBoard() {
-    for (int i = 0; i < 64; i++) {
-        removePiece(i);
-    }
-}
-
-void Chess::clearBoardDisplay() {
-    clearBoard();
-    displayBoard();
-}
-
-void Chess::addPiece(std::shared_ptr<Piece> piece, int square) {
-    board[square].setPiece(piece);
+    board.clearBoard();
+    board.displayBoard();
 }
 
 void Chess::addPiece(char sPiece, std::string sSquare) {
     try {
-        std::shared_ptr<Piece> piece = getPiece(sPiece);
+        Piece *piece = getPiece(sPiece);
         int square = getSquare(sSquare);
-        addPiece(piece, square);
-        displayBoard();
+        board.addPiece(piece, square);
+        board.displayBoard();
     } catch (InvalidPiece e) {
         std::cout << "Invalid piece: " << e.getInvalidPiece() << std::endl;
     } catch (InvalidSquare e) {
@@ -144,15 +92,11 @@ void Chess::addPiece(char sPiece, std::string sSquare) {
     }
 }
 
-void Chess::removePiece(int square) {
-    board[square].removePiece();
-}
-
 void Chess::removePiece(std::string sSquare) {
     try {
         int square = getSquare(sSquare);
-        removePiece(square);
-        displayBoard();
+        board.removePiece(square);
+        board.displayBoard();
     } catch (InvalidSquare e) {
         std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
     }
@@ -168,6 +112,50 @@ void Chess::setTurn(std::string sColour) {
 }
 
 bool Chess::checkBoard() {
-    // TODO Check if board is legal
-    return true;
+    bool result = board.checkBoard();
+    board.displayBoard();
+    return result;
+}
+
+bool Chess::move(std::string sStartSquare, std::string sEndSquare) {
+    try {
+        int startSquare = getSquare(sStartSquare);
+        int endSquare = getSquare(sEndSquare);
+        bool promotion = board.move(startSquare, endSquare, turn);
+        turn = (turn == Colour::White) ? Colour::Black : Colour::White;  // Change turn
+        board.displayBoard();
+        return promotion;
+    } catch (InvalidSquare e) {
+        std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
+    } catch (InvalidMove e) {
+        if (e.getReason() == Reason::NotExist) {
+            std::cout << "There are no pieces on " << sStartSquare << std::endl;
+        } else if (e.getReason() == Reason::WrongColour) {
+            std::cout << "Piece on " << sStartSquare << " is not the current turn's colour" << std::endl;
+        } else {
+            std::cout << "Piece on " << sStartSquare << "is unable to reach " << sEndSquare << std::endl;
+        }
+    }
+
+    // Error has been thrown
+    return false;
+}
+
+void Chess::promote(std::string sSquare, char sPromotion) {
+    try {
+        int square = getSquare(sSquare);
+        Piece *promotion = getPiece((turn == Colour::White) ? std::toupper(sPromotion) : std::tolower(sPromotion));
+
+        if ((promotion->getType() == PieceType::King) || (promotion->getType() == PieceType::Pawn)) {
+            // Unable to promote to king or pawn
+            throw InvalidPromotion{};
+        }
+
+        board.addPiece(promotion, square);
+        board.displayBoard();
+    } catch (InvalidSquare e) {
+        std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
+    } catch (InvalidPiece e) {
+        std::cout << "Invalid piece: " << e.getInvalidPiece() << std::endl;
+    }
 }
