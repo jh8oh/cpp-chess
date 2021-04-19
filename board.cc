@@ -348,6 +348,51 @@ std::vector<Move> Board::getKingMoves(int square) {
         }
     }
 
+    // Castling
+
+    if (!(board[square]->getMoved())) {
+        // If King hasn't moved...
+
+        bool leftRookPossible = true;
+        bool rightRookPossible = true;
+
+        // Left rook
+        for (int i = -3; i < 0; i++) {
+            if (board[square + i] != nullptr) {
+                leftRookPossible = false;
+            }
+        }
+
+        if (leftRookPossible) {
+            if (board[square - 4] != nullptr) {
+                if ((board[square - 4]->getType() == PieceType::Rook) &&
+                    (board[square - 4]->getColour() == board[square]->getColour()) &&
+                    (!(board[square - 4]->getMoved()))) {
+                    // If same colour rook is there and hasn't moved
+                    moves.emplace_back(square, square - 2, nullptr, false, true);
+                }
+            }
+        }
+
+        // Right rook
+        for (int i = 1; i < 3; i++) {
+            if (board[square + i] != nullptr) {
+                rightRookPossible = false;
+            }
+        }
+
+        if (rightRookPossible) {
+            if (board[square + 3] != nullptr) {
+                if ((board[square + 3]->getType() == PieceType::Rook) &&
+                    (board[square + 3]->getColour() == board[square]->getColour()) &&
+                    (!(board[square + 3]->getMoved()))) {
+                    // If same colour rook is there and hasn't moved
+                    moves.emplace_back(square, square + 2, nullptr, false, true);
+                }
+            }
+        }
+    }
+
     return moves;
 }
 
@@ -385,10 +430,24 @@ bool Board::move(int startSquare, int endSquare, Colour turn) {
         int index = find - moves.begin();
         Move move = moves[index];
         movePiece(startSquare, endSquare);
+        previousMove = move;
+        board[endSquare]->pieceMoved();
+
+        // Check enpassant
         if (move.getEnPassant()) {
             removePiece(previousMove.getEndSquare());
         }
-        previousMove = move;
+
+        // Check castling
+        if (move.getCastling()) {
+            if (endSquare > startSquare) {
+                // Right castling
+                movePiece(startSquare + 3, endSquare - 1);
+            } else {
+                // Left castling
+                movePiece(startSquare - 4, endSquare + 1);
+            }
+        }
     } else {
         throw InvalidMove(Reason::EndSquare);
     }

@@ -8,13 +8,15 @@ class Move {
     int endSquare;
     Piece *capturedPiece;
     bool enPassant;
+    bool castling;
 
    public:
-    Move(int startSquare = -1, int endSquare = -1, Piece *capturedPiece = nullptr, bool enPassant = false);
+    Move(int startSquare = -1, int endSquare = -1, Piece *capturedPiece = nullptr, bool enPassant = false, bool castling = false);
 
     int getStartSquare() const;
     int getEndSquare() const;
     bool getEnPassant() const;
+    bool getCastling() const;
 
     bool isError() const;
     bool capturesPiece() const;

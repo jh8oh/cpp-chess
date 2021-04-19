@@ -38,3 +38,11 @@ Colour Piece::getColour() const {
 PieceType Piece::getType() const {
     return type;
 }
+
+bool Piece::getMoved() const {
+    return moved;
+}
+
+void Piece::pieceMoved() {
+    moved = true;
+}
