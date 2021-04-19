@@ -449,6 +449,19 @@ bool Board::move(int startSquare, int endSquare, Colour turn) {
 
         previousMove = move;
         board[endSquare]->pieceMoved();
+
+        // Check if promotion is needed
+        if (board[endSquare]->getType() == PieceType::Pawn) {
+            if (board[endSquare]->getColour() == Colour::White) {
+                if ((endSquare >= 0) && (endSquare <= 7)) {
+                    return true;
+                }
+            } else {
+                if ((endSquare >= 56) && (endSquare <= 63)) {
+                    return true;
+                }
+            }
+        }
     } else {
         throw InvalidMove(Reason::EndSquare);
     }
