@@ -20,6 +20,9 @@ class Piece {
     Piece(Colour colour, PieceType type);
 
     char getTextDisplay() const;
+
+    Colour getColour() const;
+    PieceType getType() const;
 };
 
 #endif

@@ -6,7 +6,7 @@
 int Chess::getSquare(std::string sSquare) {
     // Checks if string is 2 characters long
     if (sSquare.length() != 2) {
-        throw InvalidSquare{sSquare};
+        throw InvalidSquare(sSquare);
     }
 
     int row, column;
@@ -17,7 +17,7 @@ int Chess::getSquare(std::string sSquare) {
 
     // Check if column and row are between 0 and 7
     if ((column < 0) || (column > 7) || (row < 0) || (row > 7)) {
-        throw InvalidSquare{sSquare};
+        throw InvalidSquare(sSquare);
     }
 
     return (row * 8) + column;
@@ -51,7 +51,7 @@ Piece *Chess::getPiece(char sPiece) {
         case 'k':
             return new Piece(colour, PieceType::King);
         default:
-            throw InvalidPiece{sPiece};
+            throw InvalidPiece(sPiece);
     }
 }
 
@@ -64,13 +64,19 @@ Colour Chess::getColour(std::string sColour) {
     } else if ((sColour == "b") || (sColour == "black")) {
         return Colour::Black;
     } else {
-        throw InvalidColour{sColour};
+        throw InvalidColour(sColour);
     }
+}
+
+void Chess::init() {
+    turn = Colour::White;
+    board.init();
+    board.displayBoard();
 }
 
 void Chess::clearBoard() {
     board.clearBoard();
-    displayBoard();
+    board.displayBoard();
 }
 
 void Chess::addPiece(char sPiece, std::string sSquare) {
@@ -106,5 +112,50 @@ void Chess::setTurn(std::string sColour) {
 }
 
 bool Chess::checkBoard() {
-    return board.checkBoard();
+    bool result = board.checkBoard();
+    board.displayBoard();
+    return result;
+}
+
+bool Chess::move(std::string sStartSquare, std::string sEndSquare) {
+    try {
+        int startSquare = getSquare(sStartSquare);
+        int endSquare = getSquare(sEndSquare);
+        bool promotion = board.move(startSquare, endSquare, turn);
+        turn = (turn == Colour::White) ? Colour::Black : Colour::White;  // Change turn
+        board.displayBoard();
+        return promotion;
+    } catch (InvalidSquare e) {
+        std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
+    } catch (InvalidMove e) {
+        if (e.getReason() == Reason::NotExist) {
+            std::cout << "There are no pieces on " << sStartSquare << std::endl;
+        } else if (e.getReason() == Reason::WrongColour) {
+            std::cout << "Piece on " << sStartSquare << " is not the current turn's colour" << std::endl;
+        } else {
+            std::cout << "Piece on " << sStartSquare << "is unable to reach " << sEndSquare << std::endl;
+        }
+    }
+
+    // Error has been thrown
+    return false;
+}
+
+void Chess::promote(std::string sSquare, char sPromotion) {
+    try {
+        int square = getSquare(sSquare);
+        Piece *promotion = getPiece((turn == Colour::White) ? std::toupper(sPromotion) : std::tolower(sPromotion));
+
+        if ((promotion->getType() == PieceType::King) || (promotion->getType() == PieceType::Pawn)) {
+            // Unable to promote to king or pawn
+            throw InvalidPromotion{};
+        }
+
+        board.addPiece(promotion, square);
+        board.displayBoard();
+    } catch (InvalidSquare e) {
+        std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
+    } catch (InvalidPiece e) {
+        std::cout << "Invalid piece: " << e.getInvalidPiece() << std::endl;
+    }
 }

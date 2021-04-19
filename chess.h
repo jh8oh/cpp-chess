@@ -17,12 +17,18 @@ class Chess {
     Colour getColour(std::string sColour);  // Returns the apporopriate enum colour
 
    public:
+    void init();
+
     // Set up
     void clearBoard();                                // Clears the board (Prints board afterwards)
     void addPiece(char sPiece, std::string sSquare);  // Adds the parameter piece to the square indicated (Prints board afterwards)
     void removePiece(std::string sSquare);            // Removes a piece from the square indicated (Prints board afterwards)
     void setTurn(std::string sColour);                // Sets the next turn to be the colour indicated
     bool checkBoard();                                // Checks whether the board is legal
+
+    // Play
+    bool move(std::string sStartSquare, std::string sEndSquare);
+    void promote(std::string sSquare, char sPromotion);
 };
 
 // Exception classes
@@ -49,5 +55,7 @@ class InvalidColour {
     InvalidColour(std::string sColour) : sColour{sColour} {}
     std::string getInvalidColour() const { return sColour; }
 };
+
+class InvalidPromotion {};
 
 #endif
