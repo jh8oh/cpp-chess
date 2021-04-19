@@ -430,8 +430,6 @@ bool Board::move(int startSquare, int endSquare, Colour turn) {
         int index = find - moves.begin();
         Move move = moves[index];
         movePiece(startSquare, endSquare);
-        previousMove = move;
-        board[endSquare]->pieceMoved();
 
         // Check enpassant
         if (move.getEnPassant()) {
@@ -448,6 +446,9 @@ bool Board::move(int startSquare, int endSquare, Colour turn) {
                 movePiece(startSquare - 4, endSquare + 1);
             }
         }
+
+        previousMove = move;
+        board[endSquare]->pieceMoved();
     } else {
         throw InvalidMove(Reason::EndSquare);
     }
