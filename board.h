@@ -8,6 +8,7 @@
 
 class Board {
     Piece *board[64];  // Board has 64 squares
+    Move previousMove;
 
     int numSquaresToEdge(int square, int direction) const;
     Move checkMove(int startSquare, int endSquare);  // Returns the move if endSquare is empty or contains enemy piece

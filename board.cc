@@ -160,6 +160,13 @@ std::vector<Move> Board::getPawnMoves(int square) {
         }
 
         // En-passant
+        if ((previousMove.getEndSquare() == square + 1) || (previousMove.getEndSquare() == square - 1)) {
+            if (board[previousMove.getEndSquare()]->getType() == PieceType::Pawn) {
+                if (previousMove.getStartSquare() == previousMove.getEndSquare() - 16) {
+                    moves.emplace_back(square, previousMove.getEndSquare() - 8, board[previousMove.getEndSquare()], true);
+                }
+            }
+        }
     } else {
         // One square down
         Move move = checkMove(square, square + 8);
@@ -192,6 +199,13 @@ std::vector<Move> Board::getPawnMoves(int square) {
         }
 
         // En-passant
+        if ((previousMove.getEndSquare() == square + 1) || (previousMove.getEndSquare() == square - 1)) {
+            if (board[previousMove.getEndSquare()]->getType() == PieceType::Pawn) {
+                if (previousMove.getStartSquare() == previousMove.getEndSquare() + 16) {
+                    moves.emplace_back(square, previousMove.getEndSquare() + 8, board[previousMove.getEndSquare()], true);
+                }
+            }
+        }
     }
 
     return moves;
@@ -365,10 +379,16 @@ bool Board::move(int startSquare, int endSquare, Colour turn) {
         throw InvalidMove(Reason::WrongColour);
     }
 
-    Move move = Move(startSquare, endSquare, board[endSquare]);
     std::vector<Move> moves = getMoves(startSquare);
-    if (std::find(moves.begin(), moves.end(), move) != moves.end()) {
+    auto find = std::find(moves.begin(), moves.end(), Move(startSquare, endSquare));
+    if (find != moves.end()) {
+        int index = find - moves.begin();
+        Move move = moves[index];
         movePiece(startSquare, endSquare);
+        if (move.getEnPassant()) {
+            removePiece(previousMove.getEndSquare());
+        }
+        previousMove = move;
     } else {
         throw InvalidMove(Reason::EndSquare);
     }
