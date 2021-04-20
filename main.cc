@@ -70,6 +70,8 @@ int main(int argc, char *argv[]) {
                             }
                         }
                     }
+                } else if (cmd == "display") {
+                    game.displayBoard()
                 }
             } else if (inSetUp) {
                 if (cmd == "clear") {
@@ -100,6 +102,8 @@ int main(int argc, char *argv[]) {
                 } else if (cmd == "cancel") {
                     // Stops set up mode
                     inSetUp = false;
+                } else if (cmd == "display") {
+                    game.displayBoard(true);
                 }
             } else {
                 if (cmd == "game") {

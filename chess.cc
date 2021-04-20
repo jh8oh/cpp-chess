@@ -74,6 +74,10 @@ void Chess::init() {
     board.displayBoard();
 }
 
+void Chess::displayBoard(bool inSetUp) {
+    board.displayBoard(inSetUp);
+}
+
 Colour Chess::getTurn() const {
     return turn;
 }

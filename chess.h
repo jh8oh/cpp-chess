@@ -18,6 +18,7 @@ class Chess {
 
    public:
     void init();
+    void displayBoard(bool inSetUp = false);
 
     Colour getTurn() const;
 
