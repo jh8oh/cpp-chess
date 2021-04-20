@@ -19,6 +19,7 @@ class Piece {
 
    public:
     Piece(Colour colour, PieceType type);
+    Piece(const Piece &other);
 
     char getTextDisplay() const;
 

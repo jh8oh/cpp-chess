@@ -10,6 +10,10 @@ int Move::getEndSquare() const {
     return endSquare;
 }
 
+Piece *Move::getCapturedPiece() const {
+    return capturedPiece;
+}
+
 bool Move::getEnPassant() const {
     return enPassant;
 }

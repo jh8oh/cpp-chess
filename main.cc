@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -9,6 +10,8 @@ using namespace std;
 int main(int argc, char *argv[]) {
     cin.exceptions(ios::eofbit | ios::failbit);
     Chess game = Chess();
+    double whiteWins = 0.0;
+    double blackWins = 0.0;
     bool inPlay = false;   // Is the game currently being played
     bool inSetUp = false;  // Is the board currently being set up
 
@@ -19,20 +22,49 @@ int main(int argc, char *argv[]) {
             if (inPlay) {
                 // Game is currently being played
                 if (cmd == "resign") {
+                    if (game.getTurn() == Colour::White) {
+                        cout << "White Resigns" << endl;
+                        blackWins += 1;
+                        inPlay = false;
+                    } else {
+                        cout << "Black Resigns" << endl;
+                        whiteWins += 1;
+                        inPlay = false;
+                    }
                 } else if (cmd == "move") {
                     // Moves a piece to a square
                     string startSquare, endSquare;
                     cin >> startSquare >> endSquare;
 
-                    if (game.move(startSquare, endSquare)) {
+                    std::vector<bool> moveResult = game.move(startSquare, endSquare);
+
+                    if (moveResult[1]) {
+                        // Checkmate
+                        if (game.getTurn() == Colour::White) {
+                            cout << "Black Wins!" << endl;
+                            blackWins += 1;
+                            inPlay = false;
+                        } else {
+                            cout << "White Wins!" << endl;
+                            whiteWins += 1;
+                            inPlay = false;
+                        }
+                    } else if (moveResult[2]) {
+                        // Stalemate
+                        cout << "Stalemate!" << endl;
+                        whiteWins += 0.5;
+                        blackWins += 0.5;
+                        inPlay = false;
+                    } else if (moveResult[0]) {
                         // If promotion is needed:
                         cout << "Promote " << endSquare << " pawn to..." << endl;
                         while (true) {
                             char promotion;
                             try {
                                 cin >> promotion;
-                                game.promote(endSquare, promotion);
-                                break;
+                                if (game.promote(endSquare, promotion)) {
+                                    break;
+                                }
                             } catch (InvalidPromotion) {
                                 cout << "Invalid promotion: " << promotion << endl;
                             }
@@ -77,6 +109,10 @@ int main(int argc, char *argv[]) {
                 } else if (cmd == "setup") {
                     // Sets up a new game
                     inSetUp = true;
+                } else if (cmd == "score") {
+                    // Prints the current score
+                    cout << "White: " << whiteWins << endl;
+                    cout << "Black: " << blackWins << endl;
                 }
             }
         }

@@ -9,7 +9,6 @@
 
 class Chess {
     Board board;
-    Board nextTurnBoard;
     Colour turn;
 
     // Helper functions
@@ -20,6 +19,8 @@ class Chess {
    public:
     void init();
 
+    Colour getTurn() const;
+
     // Set up
     void clearBoard();                                // Clears the board (Prints board afterwards)
     void addPiece(char sPiece, std::string sSquare);  // Adds the parameter piece to the square indicated (Prints board afterwards)
@@ -28,8 +29,8 @@ class Chess {
     bool checkBoard();                                // Checks whether the board is legal
 
     // Play
-    bool move(std::string sStartSquare, std::string sEndSquare);
-    void promote(std::string sSquare, char sPromotion);
+    std::vector<bool> move(std::string sStartSquare, std::string sEndSquare);  // Moves piece on start square to end square if legal (returns true if promotion needed)
+    bool promote(std::string sSquare, char sPromotion);                        // Promotes the piece on square to the promotion (returns true if successful)
 };
 
 // Exception classes

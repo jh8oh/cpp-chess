@@ -6,13 +6,25 @@
 
 #include "colour.h"
 
+Board::Board() {}
+
+Board::Board(const Board &other) : previousMove{other.previousMove}, whiteMoves{other.whiteMoves}, blackMoves{other.blackMoves}, whiteKingInCheck{other.whiteKingInCheck}, blackKingInCheck{other.blackKingInCheck} {
+    for (int i = 0; i < 64; i++) {
+        if (other.board[i] != nullptr) {
+            board[i] = new Piece(*(other.board[i]));
+        } else {
+            board[i] = nullptr;
+        }
+    }
+}
+
 Board::~Board() {
     for (int i = 0; i < 64; i++) {
         delete board[i];
     }
 }
 
-void Board::displayBoard() {
+void Board::displayBoard(bool inSetUp) {
     for (int r = 0; r < 8; r++) {
         std::cout << (char)('8' - r) << " ";  // Row numbers
         for (int c = 0; c < 8; c++) {
@@ -32,6 +44,13 @@ void Board::displayBoard() {
         std::cout << (char)('a' + i);
     }
     std::cout << std::endl;
+
+    // Check
+    if (!(inSetUp)) {
+        if (whiteKingInCheck || blackKingInCheck) {
+            std::cout << "Check" << std::endl;
+        }
+    }
 }
 
 void Board::init() {
@@ -58,6 +77,24 @@ void Board::init() {
 
     setUpBackRow(Colour::White, 56);
     setUpBackRow(Colour::Black, 0);
+
+    setAllMoves();
+}
+
+bool Board::getKingInCheck(Colour colour) {
+    if (colour == Colour::White) {
+        return whiteKingInCheck;
+    } else {
+        return blackKingInCheck;
+    }
+}
+
+std::vector<Move> Board::getAllMoves(Colour colour) {
+    if (colour == Colour::White) {
+        return whiteMoves;
+    } else {
+        return blackMoves;
+    }
 }
 
 void Board::clearBoard() {
@@ -76,15 +113,80 @@ void Board::removePiece(int square) {
     board[square] = nullptr;
 }
 
-bool Board::checkBoard() {
-    // TODO Check if board is legal (may throw invalid board)
-    return true;
+void Board::checkBoard() {
+    // Check appropriate number of kings exist
+    int whiteKingAmount = 0;
+    int blackKingAmount = 0;
+    for (int i = 0; i < 64; i++) {
+        if (board[i] != nullptr) {
+            if (board[i]->getType() == PieceType::King) {
+                if (board[i]->getColour() == Colour::White) {
+                    whiteKingAmount++;
+                } else {
+                    blackKingAmount++;
+                }
+            }
+        }
+    }
+
+    if ((whiteKingAmount != 1) || (blackKingAmount != 1)) {
+        throw InvalidBoard(InvalidBoardReason::InvalidKings);
+    }
+
+    // Check no pawns are on the first and last row
+    for (int i = 0; i < 8; i++) {
+        if (board[i] != nullptr) {
+            if (board[i]->getType() == PieceType::Pawn) {
+                throw InvalidBoard(InvalidBoardReason::InvalidPawns);
+            }
+        }
+    }
+
+    for (int i = 56; i < 64; i++) {
+        if (board[i] != nullptr) {
+            if (board[i]->getType() == PieceType::Pawn) {
+                throw InvalidBoard(InvalidBoardReason::InvalidPawns);
+            }
+        }
+    }
+
+    // Make sure king are not in check
+    setAllMoves();
+    checkForChecks();
+    if ((whiteKingInCheck) || (blackKingInCheck)) {
+        throw InvalidBoard(InvalidBoardReason::KingsInCheck);
+    }
 }
 
 void Board::movePiece(int startSquare, int endSquare) {
     delete board[endSquare];
     board[endSquare] = board[startSquare];
     board[startSquare] = nullptr;
+}
+
+void Board::checkForChecks() {
+    whiteKingInCheck = false;
+    blackKingInCheck = false;
+
+    for (auto move : whiteMoves) {
+        Piece *capturedPiece = move.getCapturedPiece();
+        if (capturedPiece != nullptr) {
+            if (capturedPiece->getType() == PieceType::King) {
+                blackKingInCheck = true;
+                break;
+            }
+        }
+    }
+
+    for (auto move : blackMoves) {
+        Piece *capturedPiece = move.getCapturedPiece();
+        if (capturedPiece != nullptr) {
+            if (capturedPiece->getType() == PieceType::King) {
+                whiteKingInCheck = true;
+                break;
+            }
+        }
+    }
 }
 
 int Board::numSquaresToEdge(int square, int direction) const {
@@ -339,9 +441,9 @@ std::vector<Move> Board::getKingMoves(int square) {
     std::vector<Move> moves;
 
     int directionDiff[] = {-9, -8, -7, -1, 1, 7, 8, 9};
-    for (int d = 0; d < 8; d++) {
+    for (int d = 1; d < 9; d++) {
         if (numSquaresToEdge(square, d) > 0) {
-            Move move = checkMove(square, square + directionDiff[d]);
+            Move move = checkMove(square, square + directionDiff[d - 1]);
             if (!(move.isError())) {
                 moves.push_back(move);
             }
@@ -349,45 +451,68 @@ std::vector<Move> Board::getKingMoves(int square) {
     }
 
     // Castling
+    if (((board[square]->getColour() == Colour::White) && !(whiteKingInCheck)) || ((board[square]->getColour() == Colour::Black) && !(blackKingInCheck))) {
+        // If King isn't in check...
+        if (!(board[square]->getMoved())) {
+            // If King hasn't moved...
 
-    if (!(board[square]->getMoved())) {
-        // If King hasn't moved...
+            bool leftRookPossible = true;
+            bool rightRookPossible = true;
 
-        bool leftRookPossible = true;
-        bool rightRookPossible = true;
-
-        // Left rook
-        for (int i = -3; i < 0; i++) {
-            if (board[square + i] != nullptr) {
-                leftRookPossible = false;
-            }
-        }
-
-        if (leftRookPossible) {
-            if (board[square - 4] != nullptr) {
-                if ((board[square - 4]->getType() == PieceType::Rook) &&
-                    (board[square - 4]->getColour() == board[square]->getColour()) &&
-                    (!(board[square - 4]->getMoved()))) {
-                    // If same colour rook is there and hasn't moved
-                    moves.emplace_back(square, square - 2, nullptr, false, true);
+            // Check if square in between is being attack
+            if (board[square]->getColour() == Colour::White) {
+                for (auto move : blackMoves) {
+                    if (move.getEndSquare() == square - 1) {
+                        leftRookPossible = false;
+                    }
+                    if (move.getEndSquare() == square + 1) {
+                        rightRookPossible = false;
+                    }
+                }
+            } else {
+                for (auto move : whiteMoves) {
+                    if (move.getEndSquare() == square - 1) {
+                        leftRookPossible = false;
+                    }
+                    if (move.getEndSquare() == square + 1) {
+                        rightRookPossible = false;
+                    }
                 }
             }
-        }
 
-        // Right rook
-        for (int i = 1; i < 3; i++) {
-            if (board[square + i] != nullptr) {
-                rightRookPossible = false;
+            // Left rook
+            for (int i = -3; i < 0; i++) {
+                if (board[square + i] != nullptr) {
+                    leftRookPossible = false;
+                }
             }
-        }
 
-        if (rightRookPossible) {
-            if (board[square + 3] != nullptr) {
-                if ((board[square + 3]->getType() == PieceType::Rook) &&
-                    (board[square + 3]->getColour() == board[square]->getColour()) &&
-                    (!(board[square + 3]->getMoved()))) {
-                    // If same colour rook is there and hasn't moved
-                    moves.emplace_back(square, square + 2, nullptr, false, true);
+            if (leftRookPossible) {
+                if (board[square - 4] != nullptr) {
+                    if ((board[square - 4]->getType() == PieceType::Rook) &&
+                        (board[square - 4]->getColour() == board[square]->getColour()) &&
+                        (!(board[square - 4]->getMoved()))) {
+                        // If same colour rook is there and hasn't moved
+                        moves.emplace_back(square, square - 2, nullptr, false, true);
+                    }
+                }
+            }
+
+            // Right rook
+            for (int i = 1; i < 3; i++) {
+                if (board[square + i] != nullptr) {
+                    rightRookPossible = false;
+                }
+            }
+
+            if (rightRookPossible) {
+                if (board[square + 3] != nullptr) {
+                    if ((board[square + 3]->getType() == PieceType::Rook) &&
+                        (board[square + 3]->getColour() == board[square]->getColour()) &&
+                        (!(board[square + 3]->getMoved()))) {
+                        // If same colour rook is there and hasn't moved
+                        moves.emplace_back(square, square + 2, nullptr, false, true);
+                    }
                 }
             }
         }
@@ -413,18 +538,48 @@ std::vector<Move> Board::getMoves(int square) {
     }
 }
 
+void Board::setAllMoves() {
+    setWhiteMoves();
+    setBlackMoves();
+    setWhiteMoves();
+}
+
+void Board::setWhiteMoves() {
+    whiteMoves.clear();
+    for (int i = 0; i < 64; i++) {
+        if (board[i] != nullptr) {
+            if (board[i]->getColour() == Colour::White) {
+                std::vector<Move> pieceMoves = getMoves(i);
+                whiteMoves.insert(whiteMoves.end(), pieceMoves.begin(), pieceMoves.end());
+            }
+        }
+    }
+}
+
+void Board::setBlackMoves() {
+    blackMoves.clear();
+    for (int i = 0; i < 64; i++) {
+        if (board[i] != nullptr) {
+            if (board[i]->getColour() == Colour::Black) {
+                std::vector<Move> pieceMoves = getMoves(i);
+                blackMoves.insert(blackMoves.end(), pieceMoves.begin(), pieceMoves.end());
+            }
+        }
+    }
+}
+
 bool Board::move(int startSquare, int endSquare, Colour turn) {
     // Check if piece on the board exists
     if (board[startSquare] == nullptr) {
-        throw InvalidMove(Reason::NotExist);
+        throw InvalidMove(InvalidMoveReason::NotExist);
     }
 
     // Check if piece on the board is the same colour as the turn
     if (board[startSquare]->getColour() != turn) {
-        throw InvalidMove(Reason::WrongColour);
+        throw InvalidMove(InvalidMoveReason::WrongColour);
     }
 
-    std::vector<Move> moves = getMoves(startSquare);
+    std::vector<Move> moves = (turn == Colour::White) ? whiteMoves : blackMoves;
     auto find = std::find(moves.begin(), moves.end(), Move(startSquare, endSquare));
     if (find != moves.end()) {
         int index = find - moves.begin();
@@ -447,10 +602,25 @@ bool Board::move(int startSquare, int endSquare, Colour turn) {
             }
         }
 
+        setAllMoves();
+        checkForChecks();
         previousMove = move;
         board[endSquare]->pieceMoved();
+
+        // Check if promotion is needed
+        if (board[endSquare]->getType() == PieceType::Pawn) {
+            if (board[endSquare]->getColour() == Colour::White) {
+                if ((endSquare >= 0) && (endSquare <= 7)) {
+                    return true;
+                }
+            } else {
+                if ((endSquare >= 56) && (endSquare <= 63)) {
+                    return true;
+                }
+            }
+        }
     } else {
-        throw InvalidMove(Reason::EndSquare);
+        throw InvalidMove(InvalidMoveReason::EndSquare);
     }
 
     return false;
