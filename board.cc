@@ -6,7 +6,11 @@
 
 #include "colour.h"
 
-Board::Board() {}
+Board::Board() {
+    for (int i = 0; i < 64; i++) {
+        board[i] = nullptr;
+    }
+}
 
 Board::Board(const Board &other) : previousMove{other.previousMove}, whiteMoves{other.whiteMoves}, blackMoves{other.blackMoves}, whiteKingInCheck{other.whiteKingInCheck}, blackKingInCheck{other.blackKingInCheck} {
     for (int i = 0; i < 64; i++) {

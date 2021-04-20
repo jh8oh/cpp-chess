@@ -6,8 +6,9 @@
 #include "board.h"
 #include "colour.h"
 #include "piece.h"
+#include "subject.h"
 
-class Match {
+class Match : public Subject {
     Board board;
     Colour turn;
 
@@ -27,11 +28,14 @@ class Match {
     void addPiece(char sPiece, std::string sSquare);  // Adds the parameter piece to the square indicated (Prints board afterwards)
     void removePiece(std::string sSquare);            // Removes a piece from the square indicated (Prints board afterwards)
     void setTurn(std::string sColour);                // Sets the next turn to be the colour indicated
+    void cancelBoard();                               // Sets the board and turn back to default
     bool checkBoard();                                // Checks whether the board is legal
 
     // Play
-    std::vector<bool> move(std::string sStartSquare, std::string sEndSquare);  // Moves piece on start square to end square if legal (returns true if promotion needed)
-    bool promote(std::string sSquare, char sPromotion);                        // Promotes the piece on square to the promotion (returns true if successful)
+    bool checkCheckmateStalemate();                               // Checks whether the current board state is check/stale mate
+    void AIMove();                                                // Moves for the AI
+    bool move(std::string sStartSquare, std::string sEndSquare);  // Moves piece on start square to end square if legal (returns true if promotion needed)
+    bool promote(std::string sSquare, char sPromotion);           // Promotes the piece on square to the promotion (returns true if successful)
 };
 
 // Exception classes

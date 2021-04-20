@@ -2,47 +2,105 @@
 
 #include <iostream>
 
+Chess::Chess() {
+    match.setObserver(this);
+}
+
+int Chess::start() {
+    std::string cmd;
+
+    while (true) {
+        std::cin >> cmd;
+        if (inPlay) {
+            // Game is currently being played
+            if (cmd == "resign") {
+                resign();
+            } else if (cmd == "move") {
+                move();
+            } else if (cmd == "display") {
+                display();
+            } else if (cmd == "help") {
+                inPlayHelp();
+            }
+        } else if (inSetUp) {
+            if (cmd == "clear") {
+                clear();
+            } else if (cmd == "+") {
+                addPiece();
+            } else if (cmd == "-") {
+                removePiece();
+            } else if (cmd == "=") {
+                setTurn();
+            } else if (cmd == "cancel") {
+                cancelSetUp();
+                inSetUp = false;
+            } else if (cmd == "done") {
+                doneSetUp();
+            } else if (cmd == "display") {
+                display(true);
+            } else if (cmd == "help") {
+                inSetUpHelp();
+            }
+        } else {
+            if (cmd == "game") {
+                startNewGame();
+            } else if (cmd == "setup") {
+                setUpNewGame();
+            } else if (cmd == "score") {
+                printScore();
+            } else if (cmd == "quit") {
+                printScore();
+                return 0;
+            } else if (cmd == "help") {
+                helpGame();
+            }
+        }
+    }
+
+    return 1;
+}
+
 void Chess::display(bool inSetUp) {
     match.displayBoard(inSetUp);
+}
+
+void Chess::notify(Mate mateInfo) {
+    if (mateInfo.getStalemate()) {
+        // Stalemate
+        std::cout << "Stalemate!" << std::endl;
+        whiteWins += 0.5;
+        blackWins += 0.5;
+    } else {
+        // Checkmate
+        if (mateInfo.getCheckmateColour() == Colour::White) {
+            std::cout << "Black Wins!" << std::endl;
+            blackWins += 1;
+        } else {
+            std::cout << "White Wins!" << std::endl;
+            whiteWins += 1;
+        }
+    }
+
+    inPlay = false;
 }
 
 void Chess::resign() {
     if (match.getTurn() == Colour::White) {
         std::cout << "White Resigns" << std::endl;
         blackWins += 1;
-
     } else {
         std::cout << "Black Resigns" << std::endl;
         whiteWins += 1;
-        inPlay = false;
     }
+    inPlay = false;
 }
 
 void Chess::move() {
     // Moves a piece to a square
-    string startSquare, endSquare;
+    std::string startSquare, endSquare;
     std::cin >> startSquare >> endSquare;
 
-    std::vector<bool> moveResult = match.move(startSquare, endSquare);
-
-    if (moveResult[1]) {
-        // Checkmate
-        if (match.getTurn() == Colour::White) {
-            std::cout << "Black Wins!" << std::endl;
-            blackWins += 1;
-            inPlay = false;
-        } else {
-            std::cout << "White Wins!" << std::endl;
-            whiteWins += 1;
-            inPlay = false;
-        }
-    } else if (moveResult[2]) {
-        // Stalemate
-        std::cout << "Stalemate!" << std::endl;
-        whiteWins += 0.5;
-        blackWins += 0.5;
-        inPlay = false;
-    } else if (moveResult[0]) {
+    if (match.move(startSquare, endSquare)) {
         // If promotion is needed:
         std::cout << "Promote " << endSquare << " pawn to..." << std::endl;
         while (true) {
@@ -60,8 +118,8 @@ void Chess::move() {
 }
 
 void Chess::inPlayHelp() {
-    std::cout << "resign : Resigns the match" << std::endl;
     std::cout << "move x y : Moves the piece on square x to square y (May need a follow up for pawn promotion)" << std::endl;
+    std::cout << "resign : Resigns the match" << std::endl;
     std::cout << "display : Displays the board" << std::endl;
 }
 
@@ -71,25 +129,32 @@ void Chess::clear() {
 
 void Chess::addPiece() {
     char piece;
-    string square;
+    std::string square;
     std::cin >> piece >> square;
     match.addPiece(piece, square);
 }
 
 void Chess::removePiece() {
-    string square;
+    std::string square;
     std::cin >> square;
     match.removePiece(square);
 }
 
 void Chess::setTurn() {
-    string colour;
+    std::string colour;
     std::cin >> colour;
     match.setTurn(colour);
 }
 
+void Chess::cancelSetUp() {
+    match.cancelBoard();
+}
+
 void Chess::doneSetUp() {
-    return match.checkBoard();
+    if (match.checkBoard()) {
+        inSetUp = false;
+        inPlay = true;
+    }
 }
 
 void Chess::inSetUpHelp() {
@@ -104,6 +169,11 @@ void Chess::inSetUpHelp() {
 
 void Chess::startNewGame() {
     match.init();
+    inPlay = true;
+}
+
+void Chess::setUpNewGame() {
+    inSetUp = true;
 }
 
 void Chess::printScore() {
@@ -112,8 +182,8 @@ void Chess::printScore() {
 }
 
 void Chess::helpGame() {
-    std::cout << "game : Starts a new game with standard set up" << std::endl;
-    std::cout << "setup : Setup the next game" << std::endl;
+    std::cout << "game x y: Starts a new game with standard set up. x : white player, y : black player" << std::endl;
+    std::cout << "setup x y: Setup the next game. x : white player, y : black player" << std::endl;
     std::cout << "score : Displays the score" << std::endl;
     std::cout << "quit : Quits the game" << std::endl;
 }

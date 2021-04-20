@@ -1,7 +1,7 @@
+#include "match.h"
+
 #include <algorithm>
 #include <iostream>
-
-#include "match.h"
 
 int Match::getSquare(std::string sSquare) {
     // Checks if string is 2 characters long
@@ -119,6 +119,11 @@ void Match::setTurn(std::string sColour) {
     }
 }
 
+void Match::cancelBoard() {
+    turn = Colour::White;
+    board.init();
+}
+
 bool Match::checkBoard() {
     try {
         board.checkBoard();
@@ -137,10 +142,38 @@ bool Match::checkBoard() {
     return false;
 }
 
-std::vector<bool> Match::move(std::string sStartSquare, std::string sEndSquare) {
-    std::vector<bool> result;  // 0: Needs promotion; 1: Checkmate; 2: Stalemate
+bool Match::checkCheckmateStalemate() {
+    bool mate = true;
 
+    // Check for checkmate/stalemate
+    Colour otherTurn = (turn == Colour::White) ? Colour::Black : Colour::White;
+    std::vector<Move> moves = board.getAllMoves(otherTurn);
+    for (auto move : moves) {
+        Board mateCheckerBoard = Board(board);
+        mateCheckerBoard.move(move.getStartSquare(), move.getEndSquare(), otherTurn);
+        if (!(mateCheckerBoard.getKingInCheck(otherTurn))) {
+            mate = false;
+            break;
+        }
+    }
+
+    if (mate) {
+        if (board.getKingInCheck(otherTurn)) {
+            notifyObserver(Mate(false, otherTurn));
+        } else {
+            notifyObserver(Mate(true, Colour::White));
+        }
+    }
+
+    return mate;
+}
+
+void Match::AIMove() {
+}
+
+bool Match::move(std::string sStartSquare, std::string sEndSquare) {
     try {
+        bool promotion;
         int startSquare = getSquare(sStartSquare);
         int endSquare = getSquare(sEndSquare);
         Board nextTurnBoard = Board(board);
@@ -158,33 +191,14 @@ std::vector<bool> Match::move(std::string sStartSquare, std::string sEndSquare) 
             }
         }
 
-        result.push_back(board.move(startSquare, endSquare, turn));
+        promotion = board.move(startSquare, endSquare, turn);
+        if (checkCheckmateStalemate()) {
+            return false;
+        }
         turn = (turn == Colour::White) ? Colour::Black : Colour::White;  // Change turn
         board.displayBoard();
 
-        // Check for checkmate/stalemate
-        std::vector<Move> moves = board.getAllMoves(turn);
-        for (auto move : moves) {
-            Board mateCheckerBoard = Board(board);
-            mateCheckerBoard.move(move.getStartSquare(), move.getEndSquare(), turn);
-            if (!(mateCheckerBoard.getKingInCheck(turn))) {
-                result.push_back(false);
-                result.push_back(false);
-                break;
-            }
-        }
-
-        if (result.size() == 1) {
-            if (board.getKingInCheck(turn)) {
-                result.push_back(true);
-                result.push_back(false);
-            } else {
-                result.push_back(false);
-                result.push_back(true);
-            }
-        }
-
-        return result;
+        return promotion;
     } catch (InvalidSquare e) {
         std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
     } catch (InvalidMove e) {
@@ -202,11 +216,7 @@ std::vector<bool> Match::move(std::string sStartSquare, std::string sEndSquare) 
     }
 
     // Error has been thrown
-    result.clear();
-    for (int i = 0; i < 3; i++) {
-        result.push_back(false);
-    }
-    return result;
+    return false;
 }
 
 bool Match::promote(std::string sSquare, char sPromotion) {
