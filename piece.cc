@@ -4,6 +4,8 @@
 
 Piece::Piece(Colour colour, PieceType type) : colour{colour}, type{type} {}
 
+Piece::Piece(const Piece &other) : colour{other.colour}, type{other.type} {}
+
 char Piece::getTextDisplay() const {
     char displayText = '-';
 

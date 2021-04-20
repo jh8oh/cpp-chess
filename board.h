@@ -9,6 +9,8 @@
 class Board {
     Piece *board[64];  // Board has 64 squares
     Move previousMove;
+    std::vector<Move> whiteMoves;
+    std::vector<Move> blackMoves;
 
     bool whiteKingInCheck;
     bool blackKingInCheck;
@@ -26,12 +28,20 @@ class Board {
     std::vector<Move> getQueenMoves(int square);
     std::vector<Move> getKingMoves(int square);
     std::vector<Move> getMoves(int square);  // Get all possible moves from this square (and whether a promotion is needed)
-    std::vector<Move> getAllMoves();         // Gets all possible moves from every piece
+
+    void setAllMoves();
+    void setWhiteMoves();  // Gets all possible moves from every white piece
+    void setBlackMoves();  // Gets all possible moves from every black piece
    public:
+    Board();
+    Board(const Board &other);
     ~Board();
 
     void displayBoard();  // Prints board either graphically or text-based;
     void init();          // Initializes board to default
+
+    // Getters
+    bool getKingInCheck(Colour colour);
 
     // Set up
     void clearBoard();                        // Clears the board
@@ -47,7 +57,9 @@ class Board {
 enum class InvalidMoveReason {
     NotExist,
     WrongColour,
-    EndSquare
+    EndSquare,
+    PutOwnKingInCheck,
+    NotRemoveKingOutOfCheck
 };
 
 class InvalidMove {

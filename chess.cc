@@ -121,6 +121,21 @@ bool Chess::move(std::string sStartSquare, std::string sEndSquare) {
     try {
         int startSquare = getSquare(sStartSquare);
         int endSquare = getSquare(sEndSquare);
+        Board nextTurnBoard = Board(board);
+        nextTurnBoard.move(startSquare, endSquare, turn);
+
+        if (board.getKingInCheck(turn)) {
+            // Check if move has not moved the King out of check
+            if (nextTurnBoard.getKingInCheck(turn)) {
+                throw InvalidMove(InvalidMoveReason::NotRemoveKingOutOfCheck);
+            }
+        } else {
+            if (nextTurnBoard.getKingInCheck(turn)) {
+                // Check if move has put the King into check
+                throw InvalidMove(InvalidMoveReason::PutOwnKingInCheck);
+            }
+        }
+
         bool promotion = board.move(startSquare, endSquare, turn);
         turn = (turn == Colour::White) ? Colour::Black : Colour::White;  // Change turn
         board.displayBoard();
@@ -132,6 +147,10 @@ bool Chess::move(std::string sStartSquare, std::string sEndSquare) {
             std::cout << "There are no pieces on " << sStartSquare << std::endl;
         } else if (e.getReason() == InvalidMoveReason::WrongColour) {
             std::cout << "Piece on " << sStartSquare << " is not the current turn's colour" << std::endl;
+        } else if (e.getReason() == InvalidMoveReason::PutOwnKingInCheck) {
+            std::cout << "Can't put own king into check" << std::endl;
+        } else if (e.getReason() == InvalidMoveReason::NotRemoveKingOutOfCheck) {
+            std::cout << "Move doesn't put King out of check" << std::endl;
         } else {
             std::cout << "Piece on " << sStartSquare << " is unable to reach " << sEndSquare << std::endl;
         }

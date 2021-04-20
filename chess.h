@@ -9,7 +9,6 @@
 
 class Chess {
     Board board;
-    Board nextTurnBoard;
     Colour turn;
 
     // Helper functions
