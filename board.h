@@ -37,8 +37,8 @@ class Board {
     Board(const Board &other);
     ~Board();
 
-    void displayBoard();  // Prints board either graphically or text-based;
-    void init();          // Initializes board to default
+    void displayBoard(bool inSetUp = false);  // Prints board either graphically or text-based;
+    void init();                              // Initializes board to default
 
     // Getters
     bool getKingInCheck(Colour colour);
@@ -48,7 +48,7 @@ class Board {
     void clearBoard();                        // Clears the board
     void addPiece(Piece *piece, int square);  // Adds the specified piece to the specified square
     void removePiece(int square);             // Removes the piece on the specified square
-    bool checkBoard();                        // Checks whether the board is legal
+    void checkBoard();                        // Checks whether the board is legal
 
     // Play
     bool move(int startSquare, int endSquare, Colour turn);  // Checks whether the move is legal then moves
@@ -71,6 +71,18 @@ class InvalidMove {
     InvalidMoveReason getReason() const { return reason; }
 };
 
-class InvalidBoard {};
+enum class InvalidBoardReason {
+    InvalidKings,
+    InvalidPawns,
+    KingsInCheck
+};
+
+class InvalidBoard {
+    InvalidBoardReason reason;
+
+   public:
+    InvalidBoard(InvalidBoardReason reason) : reason{reason} {}
+    InvalidBoardReason getReason() const { return reason; }
+};
 
 #endif

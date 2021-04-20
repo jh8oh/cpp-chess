@@ -24,7 +24,7 @@ Board::~Board() {
     }
 }
 
-void Board::displayBoard() {
+void Board::displayBoard(bool inSetUp) {
     for (int r = 0; r < 8; r++) {
         std::cout << (char)('8' - r) << " ";  // Row numbers
         for (int c = 0; c < 8; c++) {
@@ -46,8 +46,10 @@ void Board::displayBoard() {
     std::cout << std::endl;
 
     // Check
-    if (whiteKingInCheck || blackKingInCheck) {
-        std::cout << "Check" << std::endl;
+    if (!(inSetUp)) {
+        if (whiteKingInCheck || blackKingInCheck) {
+            std::cout << "Check" << std::endl;
+        }
     }
 }
 
@@ -111,10 +113,49 @@ void Board::removePiece(int square) {
     board[square] = nullptr;
 }
 
-bool Board::checkBoard() {
-    // TODO Check if board is legal (may throw invalid board)
+void Board::checkBoard() {
+    // Check appropriate number of kings exist
+    int whiteKingAmount = 0;
+    int blackKingAmount = 0;
+    for (int i = 0; i < 64; i++) {
+        if (board[i] != nullptr) {
+            if (board[i]->getType() == PieceType::King) {
+                if (board[i]->getColour() == Colour::White) {
+                    whiteKingAmount++;
+                } else {
+                    blackKingAmount++;
+                }
+            }
+        }
+    }
+
+    if ((whiteKingAmount != 1) || (blackKingAmount != 1)) {
+        throw InvalidBoard(InvalidBoardReason::InvalidKings);
+    }
+
+    // Check no pawns are on the first and last row
+    for (int i = 0; i < 8; i++) {
+        if (board[i] != nullptr) {
+            if (board[i]->getType() == PieceType::Pawn) {
+                throw InvalidBoard(InvalidBoardReason::InvalidPawns);
+            }
+        }
+    }
+
+    for (int i = 56; i < 64; i++) {
+        if (board[i] != nullptr) {
+            if (board[i]->getType() == PieceType::Pawn) {
+                throw InvalidBoard(InvalidBoardReason::InvalidPawns);
+            }
+        }
+    }
+
+    // Make sure king are not in check
     setAllMoves();
-    return true;
+    checkForChecks();
+    if ((whiteKingInCheck) || (blackKingInCheck)) {
+        throw InvalidBoard(InvalidBoardReason::KingsInCheck);
+    }
 }
 
 void Board::movePiece(int startSquare, int endSquare) {

@@ -80,7 +80,7 @@ Colour Chess::getTurn() const {
 
 void Chess::clearBoard() {
     board.clearBoard();
-    board.displayBoard();
+    board.displayBoard(true);
 }
 
 void Chess::addPiece(char sPiece, std::string sSquare) {
@@ -88,7 +88,7 @@ void Chess::addPiece(char sPiece, std::string sSquare) {
         Piece *piece = getPiece(sPiece);
         int square = getSquare(sSquare);
         board.addPiece(piece, square);
-        board.displayBoard();
+        board.displayBoard(true);
     } catch (InvalidPiece e) {
         std::cout << "Invalid piece: " << e.getInvalidPiece() << std::endl;
     } catch (InvalidSquare e) {
@@ -100,7 +100,7 @@ void Chess::removePiece(std::string sSquare) {
     try {
         int square = getSquare(sSquare);
         board.removePiece(square);
-        board.displayBoard();
+        board.displayBoard(true);
     } catch (InvalidSquare e) {
         std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
     }
@@ -116,9 +116,21 @@ void Chess::setTurn(std::string sColour) {
 }
 
 bool Chess::checkBoard() {
-    bool result = board.checkBoard();
-    board.displayBoard();
-    return result;
+    try {
+        board.checkBoard();
+        board.displayBoard();
+        return true;
+    } catch (InvalidBoard e) {
+        if (e.getReason() == InvalidBoardReason::InvalidKings) {
+            std::cout << "Board needs exactly one king of each colour" << std::endl;
+        } else if (e.getReason() == InvalidBoardReason::InvalidPawns) {
+            std::cout << "Board cannot have pawns on the first and last row" << std::endl;
+        } else {
+            std::cout << "One or both of the kings are in check" << std::endl;
+        }
+    }
+
+    return false;
 }
 
 std::vector<bool> Chess::move(std::string sStartSquare, std::string sEndSquare) {
