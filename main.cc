@@ -72,6 +72,10 @@ int main(int argc, char *argv[]) {
                     }
                 } else if (cmd == "display") {
                     game.displayBoard()
+                } else if (cmd == "help") {
+                    cout << "resign : Resigns the game" << endl;
+                    cout << "move x y : Moves the piece on square x to square y (May need a follow up for pawn promotion)" << endl;
+                    cout << "display : Displays the board" << endl;
                 }
             } else if (inSetUp) {
                 if (cmd == "clear") {
@@ -93,17 +97,25 @@ int main(int argc, char *argv[]) {
                     string colour;
                     cin >> colour;
                     game.setTurn(colour);
+                } else if (cmd == "cancel") {
+                    // Stops set up mode
+                    inSetUp = false;
                 } else if (cmd == "done") {
                     // Plays from this position if it's legal
                     if (game.checkBoard()) {
                         inSetUp = false;
                         inPlay = true;
                     }
-                } else if (cmd == "cancel") {
-                    // Stops set up mode
-                    inSetUp = false;
                 } else if (cmd == "display") {
                     game.displayBoard(true);
+                } else if (cmd == "help") {
+                    cout << "clear : Clears the board" << endl;
+                    cout << "+ p s : Adds piece p to square s" << endl;
+                    cout << "- s : Removes piece on square s if existing" << endl;
+                    cout << "= c : Changes starting colour to colour c" << endl;
+                    cout << "cancel : Stops the set up mode and discards the board created" << endl;
+                    cout << "done : Starts the game from this state" << endl;
+                    cout << "display : Displays the board" << endl;
                 }
             } else {
                 if (cmd == "game") {
@@ -117,10 +129,20 @@ int main(int argc, char *argv[]) {
                     // Prints the current score
                     cout << "White: " << whiteWins << endl;
                     cout << "Black: " << blackWins << endl;
+                } else if (cmd == "quit") {
+                    cout << "White: " << whiteWins << endl;
+                    cout << "Black: " << blackWins << endl;
+                    return 0;
+                } else if (cmd == "help") {
+                    cout << "game : Starts a new game with standard set up" << endl;
+                    cout << "setup : Setup the next game" << endl;
+                    cout << "score : Displays the score" << endl;
+                    cout << "quit : Quits the game" << endl;
                 }
             }
         }
     } catch (ios::failure &) {
         // Any I/O failure quits
+        return 1;
     }
 }
