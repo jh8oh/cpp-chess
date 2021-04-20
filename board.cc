@@ -32,6 +32,11 @@ void Board::displayBoard() {
         std::cout << (char)('a' + i);
     }
     std::cout << std::endl;
+
+    // Check
+    if (whiteKingInCheck || blackKingInCheck) {
+        std::cout << "Check" << std::endl;
+    }
 }
 
 void Board::init() {
@@ -85,6 +90,31 @@ void Board::movePiece(int startSquare, int endSquare) {
     delete board[endSquare];
     board[endSquare] = board[startSquare];
     board[startSquare] = nullptr;
+}
+
+void Board::checkForChecks() {
+    whiteKingInCheck = false;
+    blackKingInCheck = false;
+
+    std::vector<Move> allMoves = getAllMoves();
+    for (auto move : allMoves) {
+        if (whiteKingInCheck && blackKingInCheck) {
+            return;
+        }
+
+        Piece *capturedPiece = move.getCapturedPiece();
+        if (capturedPiece != nullptr) {
+            if (capturedPiece->getType() == PieceType::King) {
+                if (capturedPiece->getColour() == Colour::White) {
+                    whiteKingInCheck = true;
+                    continue;
+                } else {
+                    blackKingInCheck = true;
+                    continue;
+                }
+            }
+        }
+    }
 }
 
 int Board::numSquaresToEdge(int square, int direction) const {
@@ -413,6 +443,17 @@ std::vector<Move> Board::getMoves(int square) {
     }
 }
 
+std::vector<Move> Board::getAllMoves() {
+    std::vector<Move> moves;
+    for (int i = 0; i < 64; i++) {
+        if (board[i] != nullptr) {
+            std::vector<Move> pieceMoves = getMoves(i);
+            moves.insert(moves.end(), pieceMoves.begin(), pieceMoves.end());
+        }
+    }
+    return moves;
+}
+
 bool Board::move(int startSquare, int endSquare, Colour turn) {
     // Check if piece on the board exists
     if (board[startSquare] == nullptr) {
@@ -447,6 +488,7 @@ bool Board::move(int startSquare, int endSquare, Colour turn) {
             }
         }
 
+        checkForChecks();
         previousMove = move;
         board[endSquare]->pieceMoved();
 

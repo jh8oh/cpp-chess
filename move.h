@@ -15,6 +15,7 @@ class Move {
 
     int getStartSquare() const;
     int getEndSquare() const;
+    Piece *getCapturedPiece() const;
     bool getEnPassant() const;
     bool getCastling() const;
 

@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
                             char promotion;
                             try {
                                 cin >> promotion;
-                                if (game.promote(promotion, endSquare)) {
+                                if (game.promote(endSquare, promotion)) {
                                     break;
                                 }
                             } catch (InvalidPromotion) {
