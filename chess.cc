@@ -74,6 +74,10 @@ void Chess::init() {
     board.displayBoard();
 }
 
+Colour Chess::getTurn() const {
+    return turn;
+}
+
 void Chess::clearBoard() {
     board.clearBoard();
     board.displayBoard();
@@ -117,7 +121,9 @@ bool Chess::checkBoard() {
     return result;
 }
 
-bool Chess::move(std::string sStartSquare, std::string sEndSquare) {
+std::vector<bool> Chess::move(std::string sStartSquare, std::string sEndSquare) {
+    std::vector<bool> result;  // 0: Needs promotion; 1: Checkmate; 2: Stalemate
+
     try {
         int startSquare = getSquare(sStartSquare);
         int endSquare = getSquare(sEndSquare);
@@ -136,10 +142,33 @@ bool Chess::move(std::string sStartSquare, std::string sEndSquare) {
             }
         }
 
-        bool promotion = board.move(startSquare, endSquare, turn);
+        result.push_back(board.move(startSquare, endSquare, turn));
         turn = (turn == Colour::White) ? Colour::Black : Colour::White;  // Change turn
         board.displayBoard();
-        return promotion;
+
+        // Check for checkmate/stalemate
+        std::vector<Move> moves = board.getAllMoves(turn);
+        for (auto move : moves) {
+            Board mateCheckerBoard = Board(board);
+            mateCheckerBoard.move(move.getStartSquare(), move.getEndSquare(), turn);
+            if (!(mateCheckerBoard.getKingInCheck(turn))) {
+                result.push_back(false);
+                result.push_back(false);
+                break;
+            }
+        }
+
+        if (result.size() == 1) {
+            if (board.getKingInCheck(turn)) {
+                result.push_back(true);
+                result.push_back(false);
+            } else {
+                result.push_back(false);
+                result.push_back(true);
+            }
+        }
+
+        return result;
     } catch (InvalidSquare e) {
         std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
     } catch (InvalidMove e) {
@@ -157,7 +186,11 @@ bool Chess::move(std::string sStartSquare, std::string sEndSquare) {
     }
 
     // Error has been thrown
-    return false;
+    result.clear();
+    for (int i = 0; i < 3; i++) {
+        result.push_back(false);
+    }
+    return result;
 }
 
 bool Chess::promote(std::string sSquare, char sPromotion) {

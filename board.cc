@@ -87,6 +87,14 @@ bool Board::getKingInCheck(Colour colour) {
     }
 }
 
+std::vector<Move> Board::getAllMoves(Colour colour) {
+    if (colour == Colour::White) {
+        return whiteMoves;
+    } else {
+        return blackMoves;
+    }
+}
+
 void Board::clearBoard() {
     for (int i = 0; i < 64; i++) {
         removePiece(i);

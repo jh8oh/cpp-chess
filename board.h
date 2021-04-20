@@ -42,6 +42,7 @@ class Board {
 
     // Getters
     bool getKingInCheck(Colour colour);
+    std::vector<Move> getAllMoves(Colour colour);
 
     // Set up
     void clearBoard();                        // Clears the board
