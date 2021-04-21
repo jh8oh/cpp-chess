@@ -192,11 +192,12 @@ bool Match::move(std::string sStartSquare, std::string sEndSquare) {
         }
 
         promotion = board.move(startSquare, endSquare, turn);
+        board.displayBoard();
+
         if (checkCheckmateStalemate()) {
             return false;
         }
         turn = (turn == Colour::White) ? Colour::Black : Colour::White;  // Change turn
-        board.displayBoard();
 
         return promotion;
     } catch (InvalidSquare e) {
