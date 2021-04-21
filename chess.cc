@@ -1,232 +1,189 @@
 #include "chess.h"
 
-#include <algorithm>
 #include <iostream>
 
-int Chess::getSquare(std::string sSquare) {
-    // Checks if string is 2 characters long
-    if (sSquare.length() != 2) {
-        throw InvalidSquare(sSquare);
-    }
-
-    int row, column;
-
-    // Converts characters to ASCII equivilent then remove the difference from 0.
-    column = (int)(sSquare.at(0) - 'a');
-    row = 7 - ((int)(sSquare.at(1) - '1'));  // Invert the row (since row '1' starts at the bottom)
-
-    // Check if column and row are between 0 and 7
-    if ((column < 0) || (column > 7) || (row < 0) || (row > 7)) {
-        throw InvalidSquare(sSquare);
-    }
-
-    return (row * 8) + column;
+Chess::Chess() {
+    match.setObserver(this);
 }
 
-Piece *Chess::getPiece(char sPiece) {
-    Colour colour;
-    if (sPiece > 97) {
-        colour = Colour::Black;  // ASCII lowercase
+int Chess::start() {
+    std::string cmd;
+
+    while (true) {
+        std::cin >> cmd;
+        if (inPlay) {
+            // Game is currently being played
+            if (cmd == "resign") {
+                resign();
+            } else if (cmd == "move") {
+                move();
+            } else if (cmd == "display") {
+                display();
+            } else if (cmd == "help") {
+                inPlayHelp();
+            }
+        } else if (inSetUp) {
+            if (cmd == "clear") {
+                clear();
+            } else if (cmd == "+") {
+                addPiece();
+            } else if (cmd == "-") {
+                removePiece();
+            } else if (cmd == "=") {
+                setTurn();
+            } else if (cmd == "cancel") {
+                cancelSetUp();
+                inSetUp = false;
+            } else if (cmd == "done") {
+                doneSetUp();
+            } else if (cmd == "display") {
+                display(true);
+            } else if (cmd == "help") {
+                inSetUpHelp();
+            }
+        } else {
+            if (cmd == "game") {
+                startNewGame();
+            } else if (cmd == "setup") {
+                setUpNewGame();
+            } else if (cmd == "score") {
+                printScore();
+            } else if (cmd == "quit") {
+                printScore();
+                return 0;
+            } else if (cmd == "help") {
+                helpGame();
+            }
+        }
+    }
+
+    return 1;
+}
+
+void Chess::display(bool inSetUp) {
+    match.displayBoard(inSetUp);
+}
+
+void Chess::notify(Mate mateInfo) {
+    if (mateInfo.getStalemate()) {
+        // Stalemate
+        std::cout << "Stalemate!" << std::endl;
+        whiteWins += 0.5;
+        blackWins += 0.5;
     } else {
-        colour = Colour::White;
+        // Checkmate
+        if (mateInfo.getCheckmateColour() == Colour::White) {
+            std::cout << "Black Wins!" << std::endl;
+            blackWins += 1;
+        } else {
+            std::cout << "White Wins!" << std::endl;
+            whiteWins += 1;
+        }
     }
 
-    switch (sPiece) {
-        case 'P':
-        case 'p':
-            return new Piece(colour, PieceType::Pawn);
-        case 'B':
-        case 'b':
-            return new Piece(colour, PieceType::Bishop);
-        case 'N':
-        case 'n':
-            return new Piece(colour, PieceType::Knight);
-        case 'R':
-        case 'r':
-            return new Piece(colour, PieceType::Rook);
-        case 'Q':
-        case 'q':
-            return new Piece(colour, PieceType::Queen);
-        case 'K':
-        case 'k':
-            return new Piece(colour, PieceType::King);
-        default:
-            throw InvalidPiece(sPiece);
-    }
+    inPlay = false;
 }
 
-Colour Chess::getColour(std::string sColour) {
-    // Lower cases every character
-    std::transform(sColour.begin(), sColour.end(), sColour.begin(), ::tolower);
-
-    if ((sColour == "w") || (sColour == "white")) {
-        return Colour::White;
-    } else if ((sColour == "b") || (sColour == "black")) {
-        return Colour::Black;
+void Chess::resign() {
+    if (match.getTurn() == Colour::White) {
+        std::cout << "White Resigns" << std::endl;
+        blackWins += 1;
     } else {
-        throw InvalidColour(sColour);
+        std::cout << "Black Resigns" << std::endl;
+        whiteWins += 1;
     }
+    inPlay = false;
 }
 
-void Chess::init() {
-    turn = Colour::White;
-    board.init();
-    board.displayBoard();
-}
+void Chess::move() {
+    // Moves a piece to a square
+    std::string startSquare, endSquare;
+    std::cin >> startSquare >> endSquare;
 
-void Chess::displayBoard(bool inSetUp) {
-    board.displayBoard(inSetUp);
-}
-
-Colour Chess::getTurn() const {
-    return turn;
-}
-
-void Chess::clearBoard() {
-    board.clearBoard();
-    board.displayBoard(true);
-}
-
-void Chess::addPiece(char sPiece, std::string sSquare) {
-    try {
-        Piece *piece = getPiece(sPiece);
-        int square = getSquare(sSquare);
-        board.addPiece(piece, square);
-        board.displayBoard(true);
-    } catch (InvalidPiece e) {
-        std::cout << "Invalid piece: " << e.getInvalidPiece() << std::endl;
-    } catch (InvalidSquare e) {
-        std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
-    }
-}
-
-void Chess::removePiece(std::string sSquare) {
-    try {
-        int square = getSquare(sSquare);
-        board.removePiece(square);
-        board.displayBoard(true);
-    } catch (InvalidSquare e) {
-        std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
-    }
-}
-
-void Chess::setTurn(std::string sColour) {
-    try {
-        Colour colour = getColour(sColour);
-        turn = colour;
-    } catch (InvalidColour e) {
-        std::cout << "Invalid colour: " << e.getInvalidColour() << std::endl;
-    }
-}
-
-bool Chess::checkBoard() {
-    try {
-        board.checkBoard();
-        board.displayBoard();
-        return true;
-    } catch (InvalidBoard e) {
-        if (e.getReason() == InvalidBoardReason::InvalidKings) {
-            std::cout << "Board needs exactly one king of each colour" << std::endl;
-        } else if (e.getReason() == InvalidBoardReason::InvalidPawns) {
-            std::cout << "Board cannot have pawns on the first and last row" << std::endl;
-        } else {
-            std::cout << "One or both of the kings are in check" << std::endl;
-        }
-    }
-
-    return false;
-}
-
-std::vector<bool> Chess::move(std::string sStartSquare, std::string sEndSquare) {
-    std::vector<bool> result;  // 0: Needs promotion; 1: Checkmate; 2: Stalemate
-
-    try {
-        int startSquare = getSquare(sStartSquare);
-        int endSquare = getSquare(sEndSquare);
-        Board nextTurnBoard = Board(board);
-        nextTurnBoard.move(startSquare, endSquare, turn);
-
-        if (board.getKingInCheck(turn)) {
-            // Check if move has not moved the King out of check
-            if (nextTurnBoard.getKingInCheck(turn)) {
-                throw InvalidMove(InvalidMoveReason::NotRemoveKingOutOfCheck);
-            }
-        } else {
-            if (nextTurnBoard.getKingInCheck(turn)) {
-                // Check if move has put the King into check
-                throw InvalidMove(InvalidMoveReason::PutOwnKingInCheck);
+    if (match.move(startSquare, endSquare)) {
+        // If promotion is needed:
+        std::cout << "Promote " << endSquare << " pawn to..." << std::endl;
+        while (true) {
+            char promotion;
+            try {
+                std::cin >> promotion;
+                if (match.promote(endSquare, promotion)) {
+                    break;
+                }
+            } catch (InvalidPromotion) {
+                std::cout << "Invalid promotion: " << promotion << std::endl;
             }
         }
-
-        result.push_back(board.move(startSquare, endSquare, turn));
-        turn = (turn == Colour::White) ? Colour::Black : Colour::White;  // Change turn
-        board.displayBoard();
-
-        // Check for checkmate/stalemate
-        std::vector<Move> moves = board.getAllMoves(turn);
-        for (auto move : moves) {
-            Board mateCheckerBoard = Board(board);
-            mateCheckerBoard.move(move.getStartSquare(), move.getEndSquare(), turn);
-            if (!(mateCheckerBoard.getKingInCheck(turn))) {
-                result.push_back(false);
-                result.push_back(false);
-                break;
-            }
-        }
-
-        if (result.size() == 1) {
-            if (board.getKingInCheck(turn)) {
-                result.push_back(true);
-                result.push_back(false);
-            } else {
-                result.push_back(false);
-                result.push_back(true);
-            }
-        }
-
-        return result;
-    } catch (InvalidSquare e) {
-        std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
-    } catch (InvalidMove e) {
-        if (e.getReason() == InvalidMoveReason::NotExist) {
-            std::cout << "There are no pieces on " << sStartSquare << std::endl;
-        } else if (e.getReason() == InvalidMoveReason::WrongColour) {
-            std::cout << "Piece on " << sStartSquare << " is not the current turn's colour" << std::endl;
-        } else if (e.getReason() == InvalidMoveReason::PutOwnKingInCheck) {
-            std::cout << "Can't put own king into check" << std::endl;
-        } else if (e.getReason() == InvalidMoveReason::NotRemoveKingOutOfCheck) {
-            std::cout << "Move doesn't put King out of check" << std::endl;
-        } else {
-            std::cout << "Piece on " << sStartSquare << " is unable to reach " << sEndSquare << std::endl;
-        }
     }
-
-    // Error has been thrown
-    result.clear();
-    for (int i = 0; i < 3; i++) {
-        result.push_back(false);
-    }
-    return result;
 }
 
-bool Chess::promote(std::string sSquare, char sPromotion) {
-    try {
-        int square = getSquare(sSquare);
-        Piece *promotion = getPiece((turn == Colour::White) ? std::toupper(sPromotion) : std::tolower(sPromotion));
+void Chess::inPlayHelp() {
+    std::cout << "move x y : Moves the piece on square x to square y (May need a follow up for pawn promotion)" << std::endl;
+    std::cout << "resign : Resigns the match" << std::endl;
+    std::cout << "display : Displays the board" << std::endl;
+}
 
-        if ((promotion->getType() == PieceType::King) || (promotion->getType() == PieceType::Pawn)) {
-            // Unable to promote to king or pawn
-            throw InvalidPromotion{};
-        }
+void Chess::clear() {
+    match.clearBoard();
+}
 
-        board.addPiece(promotion, square);
-        board.displayBoard();
-        return true;
-    } catch (InvalidSquare e) {
-        std::cout << "Invalid square: " << e.getInvalidSquare() << std::endl;
-    } catch (InvalidPiece e) {
-        std::cout << "Invalid piece: " << e.getInvalidPiece() << std::endl;
+void Chess::addPiece() {
+    char piece;
+    std::string square;
+    std::cin >> piece >> square;
+    match.addPiece(piece, square);
+}
+
+void Chess::removePiece() {
+    std::string square;
+    std::cin >> square;
+    match.removePiece(square);
+}
+
+void Chess::setTurn() {
+    std::string colour;
+    std::cin >> colour;
+    match.setTurn(colour);
+}
+
+void Chess::cancelSetUp() {
+    match.cancelBoard();
+}
+
+void Chess::doneSetUp() {
+    if (match.checkBoard()) {
+        inSetUp = false;
+        inPlay = true;
     }
+}
 
-    return false;
+void Chess::inSetUpHelp() {
+    std::cout << "clear : Clears the board" << std::endl;
+    std::cout << "+ p s : Adds piece p to square s" << std::endl;
+    std::cout << "- s : Removes piece on square s if existing" << std::endl;
+    std::cout << "= c : Changes starting colour to colour c" << std::endl;
+    std::cout << "cancel : Stops the set up mode and discards the board created" << std::endl;
+    std::cout << "done : Starts the match from this state" << std::endl;
+    std::cout << "display : Displays the board" << std::endl;
+}
+
+void Chess::startNewGame() {
+    match.init();
+    inPlay = true;
+}
+
+void Chess::setUpNewGame() {
+    inSetUp = true;
+}
+
+void Chess::printScore() {
+    std::cout << "White: " << whiteWins << std::endl;
+    std::cout << "Black: " << blackWins << std::endl;
+}
+
+void Chess::helpGame() {
+    std::cout << "game x y: Starts a new game with standard set up. x : white player, y : black player" << std::endl;
+    std::cout << "setup x y: Setup the next game. x : white player, y : black player" << std::endl;
+    std::cout << "score : Displays the score" << std::endl;
+    std::cout << "quit : Quits the game" << std::endl;
 }

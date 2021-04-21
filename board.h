@@ -12,8 +12,8 @@ class Board {
     std::vector<Move> whiteMoves;
     std::vector<Move> blackMoves;
 
-    bool whiteKingInCheck;
-    bool blackKingInCheck;
+    bool whiteKingInCheck = false;
+    bool blackKingInCheck = false;
 
     void movePiece(int startSquare, int endSquare);  // Moves the piece on start square to end square (no checkers)
 
